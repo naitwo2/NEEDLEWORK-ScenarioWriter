@@ -1,0 +1,498 @@
+unset key protection enable
+set clock dst-off
+set clock ntp
+set clock timezone 9
+set clock dst recurring start-weekday 2 0 3 02:00 end-weekday 1 0 11 02:00
+set vrouter trust-vr sharable
+set vrouter "untrust-vr"
+exit
+set vrouter "trust-vr"
+unset auto-route-export
+exit
+set service "src_60000-dst_80" protocol tcp src-port 60000-60000 dst-port 80-80 
+set service "src_60000-dst_80" + udp src-port 60000-60000 dst-port 53-53 
+set alg appleichat enable
+unset alg appleichat re-assembly enable
+set alg sctp enable
+set auth-server "Local" id 0
+set auth-server "Local" server-name "Local"
+set auth default auth server "Local"
+set auth radius accounting port 1646
+set admin name "admin"
+set admin password "nH/vDirbE5GBcjdGoslAEBBtHFA6En"
+set admin auth web timeout 0
+set admin auth dial-in timeout 3
+set admin auth server "Local"
+set admin format dos
+set zone "Trust" vrouter "trust-vr"
+set zone "Untrust" vrouter "trust-vr"
+set zone "DMZ" vrouter "trust-vr"
+set zone "VLAN" vrouter "trust-vr"
+set zone id 100 "MGT2"
+set zone "MGT2" vrouter "untrust-vr"
+set zone id 101 "DMZ1"
+set zone id 102 "DMZ2"
+set zone "Untrust-Tun" vrouter "trust-vr"
+set zone "Trust" block 
+unset zone "Trust" tcp-rst 
+set zone "Untrust" block 
+unset zone "Untrust" tcp-rst 
+set zone "MGT" block 
+unset zone "V1-Trust" tcp-rst 
+unset zone "V1-Untrust" tcp-rst 
+set zone "DMZ" tcp-rst 
+unset zone "V1-DMZ" tcp-rst 
+unset zone "VLAN" tcp-rst 
+unset zone "MGT2" tcp-rst 
+unset zone "DMZ1" tcp-rst 
+unset zone "DMZ2" tcp-rst 
+set zone "Untrust" screen alarm-without-drop
+set zone "Untrust" screen on-tunnel
+set zone "Untrust" screen icmp-flood
+set zone "Untrust" screen udp-flood
+set zone "Untrust" screen winnuke
+set zone "Untrust" screen port-scan
+set zone "Untrust" screen ip-sweep
+set zone "Untrust" screen tear-drop
+set zone "Untrust" screen syn-flood
+set zone "Untrust" screen ip-spoofing
+set zone "Untrust" screen ping-death
+set zone "Untrust" screen ip-filter-src
+set zone "Untrust" screen land
+set zone "Untrust" screen syn-frag
+set zone "Untrust" screen tcp-no-flag
+set zone "Untrust" screen unknown-protocol
+set zone "Untrust" screen ip-bad-option
+set zone "Untrust" screen ip-record-route
+set zone "Untrust" screen ip-timestamp-opt
+set zone "Untrust" screen ip-security-opt
+set zone "Untrust" screen ip-loose-src-route
+set zone "Untrust" screen ip-strict-src-route
+set zone "Untrust" screen ip-stream-opt
+set zone "Untrust" screen icmp-fragment
+set zone "Untrust" screen icmp-large
+set zone "Untrust" screen syn-fin
+set zone "Untrust" screen fin-no-ack
+set zone "Untrust" screen limit-session source-ip-based
+set zone "Untrust" screen syn-ack-ack-proxy
+set zone "Untrust" screen block-frag
+set zone "Untrust" screen limit-session destination-ip-based
+set zone "Untrust" screen component-block zip
+set zone "Untrust" screen component-block jar
+set zone "Untrust" screen component-block exe
+set zone "Untrust" screen component-block activex
+set zone "Untrust" screen icmp-id
+set zone "Untrust" screen tcp-sweep
+set zone "Untrust" screen udp-sweep
+set zone "Untrust" screen ip-spoofing drop-no-rpf-route
+set zone "V1-Untrust" screen tear-drop
+set zone "V1-Untrust" screen syn-flood
+set zone "V1-Untrust" screen ping-death
+set zone "V1-Untrust" screen ip-filter-src
+set zone "V1-Untrust" screen land
+set zone "DMZ" screen alarm-without-drop
+set zone "DMZ" screen on-tunnel
+set zone "DMZ" screen icmp-flood
+set zone "DMZ" screen udp-flood
+set zone "DMZ" screen winnuke
+set zone "DMZ" screen port-scan
+set zone "DMZ" screen ip-sweep
+set zone "DMZ" screen tear-drop
+set zone "DMZ" screen syn-flood
+set zone "DMZ" screen ip-spoofing
+set zone "DMZ" screen ping-death
+set zone "DMZ" screen ip-filter-src
+set zone "DMZ" screen land
+set zone "DMZ" screen syn-frag
+set zone "DMZ" screen tcp-no-flag
+set zone "DMZ" screen unknown-protocol
+set zone "DMZ" screen ip-bad-option
+set zone "DMZ" screen ip-record-route
+set zone "DMZ" screen ip-timestamp-opt
+set zone "DMZ" screen ip-security-opt
+set zone "DMZ" screen ip-loose-src-route
+set zone "DMZ" screen ip-strict-src-route
+set zone "DMZ" screen ip-stream-opt
+set zone "DMZ" screen icmp-fragment
+set zone "DMZ" screen icmp-large
+set zone "DMZ" screen syn-fin
+set zone "DMZ" screen fin-no-ack
+set zone "DMZ" screen limit-session source-ip-based
+set zone "DMZ" screen syn-ack-ack-proxy
+set zone "DMZ" screen block-frag
+set zone "DMZ" screen limit-session destination-ip-based
+set zone "DMZ" screen component-block zip
+set zone "DMZ" screen component-block jar
+set zone "DMZ" screen component-block exe
+set zone "DMZ" screen component-block activex
+set zone "DMZ" screen icmp-id
+set zone "DMZ" screen tcp-sweep
+set zone "DMZ" screen udp-sweep
+set zone "DMZ" screen ip-spoofing drop-no-rpf-route
+set interface "bri0/0" zone "Untrust"
+set interface "ethernet0/0" zone "Untrust"
+set interface "ethernet0/1" zone "Trust"
+set interface "ethernet0/3" zone "MGT2"
+set interface "ethernet0/5.1" tag 30 zone "DMZ2"
+set interface "ethernet0/5.2" tag 20 zone "DMZ1"
+set interface "bgroup0" zone "Trust"
+set interface bgroup0 port ethernet0/6
+unset interface vlan1 ip
+set interface ethernet0/0 ip 10.0.0.254/24
+set interface ethernet0/0 route
+set interface ethernet0/3 ip 192.168.79.50/24
+set interface ethernet0/3 route
+set interface ethernet0/5.1 ip 172.16.30.254/24
+set interface ethernet0/5.1 route
+set interface ethernet0/5.2 ip 172.16.20.254/24
+set interface ethernet0/5.2 route
+set interface bgroup0 ip 172.16.0.254/24
+set interface bgroup0 route
+set interface ethernet0/5.1 mtu 1500
+unset interface vlan1 bypass-others-ipsec
+unset interface vlan1 bypass-non-ip
+set interface ethernet0/0 ip manageable
+set interface ethernet0/3 ip manageable
+unset interface ethernet0/5.1 ip manageable
+unset interface ethernet0/5.2 ip manageable
+set interface bgroup0 ip manageable
+unset interface ethernet0/1 manage ping
+unset interface ethernet0/1 manage ssh
+unset interface ethernet0/1 manage telnet
+unset interface ethernet0/1 manage snmp
+unset interface ethernet0/1 manage ssl
+unset interface ethernet0/1 manage web
+set interface ethernet0/3 manage ping
+set interface ethernet0/3 manage ssh
+set interface ethernet0/3 manage telnet
+set interface ethernet0/3 manage web
+set interface ethernet0/5.1 manage ping
+set interface ethernet0/5.2 manage ping
+unset interface bgroup0 manage ping
+unset interface bgroup0 manage ssh
+unset interface bgroup0 manage telnet
+unset interface bgroup0 manage snmp
+unset interface bgroup0 manage ssl
+unset interface bgroup0 manage web
+set interface ethernet0/0 dip 4 10.0.0.100 10.0.0.100
+set interface ethernet0/0 ext ip 100.100.100.100 255.255.255.255 dip 5 100.100.100.100 100.100.100.100
+set interface bgroup0 proxy-arp-entry 172.16.0.1 172.16.0.253
+set interface "bgroup0" mip 172.16.0.254 host 200.200.200.203 netmask 255.255.255.255 vr "trust-vr"
+set flow tcp-mss
+unset flow no-tcp-seq-check
+set flow tcp-syn-check
+unset flow tcp-syn-bit-check
+set flow reverse-route clear-text prefer
+set flow reverse-route tunnel always
+set hostname NEEDLEWORK-SSG5
+set pki authority default scep mode "auto"
+set pki x509 default cert-path partial
+set dns host dns1 192.168.79.59 src-interface ethernet0/0
+set dns host dns2 8.8.4.4
+set dns host dns3 0.0.0.0
+set dns host schedule 06:28
+set dns host name needleworkhost 192.168.79.59 
+set address "Trust" "100.100.100.111/32" 100.100.100.111 255.255.255.255
+set address "Trust" "100.100.100.112/32" 100.100.100.112 255.255.255.255
+set address "Trust" "172.16.0.10/32" 172.16.0.10 255.255.255.255
+set address "Trust" "172.16.0.100/32" 172.16.0.100 255.255.255.255
+set address "Trust" "172.16.0.107/32" 172.16.0.107 255.255.255.255
+set address "Trust" "172.16.0.108/32" 172.16.0.108 255.255.255.255
+set address "Trust" "172.16.0.109/32" 172.16.0.109 255.255.255.255
+set address "Trust" "172.16.0.11/32" 172.16.0.11 255.255.255.255
+set address "Trust" "172.16.0.110/32" 172.16.0.110 255.255.255.255
+set address "Trust" "172.16.0.111/32" 172.16.0.111 255.255.255.255
+set address "Trust" "172.16.0.112/32" 172.16.0.112 255.255.255.255
+set address "Trust" "172.16.0.113/32" 172.16.0.113 255.255.255.255
+set address "Trust" "172.16.0.114/32" 172.16.0.114 255.255.255.255
+set address "Trust" "172.16.0.12/32" 172.16.0.12 255.255.255.255
+set address "Trust" "172.16.0.13/32" 172.16.0.13 255.255.255.255
+set address "Trust" "172.16.0.253/32" 172.16.0.253 255.255.255.255
+set address "Trust" "172.16.0.254/32" 172.16.0.254 255.255.255.255
+set address "Trust" "172.16.1.100/32" 172.16.1.100 255.255.255.255
+set address "Trust" "172.16.100.112/32" 172.16.100.112 255.255.255.255
+set address "Trust" "192.168.1.100/32" 192.168.1.100 255.255.255.255
+set address "Trust" "192.168.1.101/32" 192.168.1.101 255.255.255.255
+set address "Trust" "192.168.1.102/32" 192.168.1.102 255.255.255.255
+set address "Trust" "192.168.1.103/32" 192.168.1.103 255.255.255.255
+set address "Trust" "192.168.1.104/32" 192.168.1.104 255.255.255.255
+set address "Trust" "192.168.1.105/32" 192.168.1.105 255.255.255.255
+set address "Trust" "192.168.1.106/32" 192.168.1.106 255.255.255.255
+set address "Trust" "192.168.1.107/32" 192.168.1.107 255.255.255.255
+set address "Trust" "192.168.1.108/32" 192.168.1.108 255.255.255.255
+set address "Trust" "192.168.1.109/32" 192.168.1.109 255.255.255.255
+set address "Trust" "192.168.1.222/32" 192.168.1.222 255.255.255.255
+set address "Trust" "192.168.2.100/32" 192.168.2.100 255.255.255.255
+set address "Trust" "192.168.3.100/32" 192.168.3.100 255.255.255.255
+set address "Trust" "192.168.4.100/32" 192.168.4.100 255.255.255.255
+set address "Trust" "192.168.5.100/32" 192.168.5.100 255.255.255.255
+set address "Untrust" "1.1.1.100/32" 1.1.1.100 255.255.255.255
+set address "Untrust" "10.0.0.120/32" 10.0.0.120 255.255.255.255
+set address "Untrust" "10.0.0.121/32" 10.0.0.121 255.255.255.255
+set address "Untrust" "10.10.10.10/32" 10.10.10.10 255.255.255.255
+set address "Untrust" "100.100.100.111/32" 100.100.100.111 255.255.255.255
+set address "Untrust" "100.100.100.112/32" 100.100.100.112 255.255.255.255
+set address "Untrust" "100.100.100.113/32" 100.100.100.113 255.255.255.255
+set address "Untrust" "100.100.100.114/32" 100.100.100.114 255.255.255.255
+set address "Untrust" "111.111.111.111/32" 111.111.111.111 255.255.255.255
+set address "Untrust" "111.111.111.112/32" 111.111.111.112 255.255.255.255
+set address "Untrust" "111.111.111.113/32" 111.111.111.113 255.255.255.255
+set address "Untrust" "111.111.111.114/32" 111.111.111.114 255.255.255.255
+set address "Untrust" "172.16.0.10/32" 172.16.0.10 255.255.255.255
+set address "Untrust" "172.16.0.11/32" 172.16.0.11 255.255.255.255
+set address "Untrust" "172.16.0.111/32" 172.16.0.111 255.255.255.255
+set address "Untrust" "172.16.0.113/32" 172.16.0.113 255.255.255.255
+set address "Untrust" "172.16.0.253/32" 172.16.0.253 255.255.255.255
+set address "Untrust" "2.2.2.100/32" 2.2.2.100 255.255.255.255
+set address "Untrust" "200.200.200.200/32" 200.200.200.200 255.255.255.255
+set address "Untrust" "200.200.200.201/32" 200.200.200.201 255.255.255.255
+set address "Untrust" "211.211.211.211/32" 211.211.211.211 255.255.255.255
+set address "Untrust" "22.22.22.22/32" 22.22.22.22 255.255.255.255
+set address "Untrust" "3.3.3.100/32" 3.3.3.100 255.255.255.255
+set address "Untrust" "7.7.7.7/32" 7.7.7.7 255.255.255.255
+set address "Untrust" "8.8.8.8/32" 8.8.8.8 255.255.255.255
+set address "DMZ1" "172.30.1.222/32" 172.30.1.222 255.255.255.255
+set address "DMZ2" "172.30.2.222/32" 172.30.2.222 255.255.255.255
+set crypto-policy
+exit
+set ike respond-bad-spi 1
+set ike ikev2 ike-sa-soft-lifetime 60
+unset ike ikeid-enumeration
+unset ike dos-protection
+unset ipsec access-session enable
+set ipsec access-session maximum 5000
+set ipsec access-session upper-threshold 0
+set ipsec access-session lower-threshold 0
+set ipsec access-session dead-p2-sa-timeout 0
+unset ipsec access-session log-error
+unset ipsec access-session info-exch-connected
+unset ipsec access-session use-error-log
+set arp nat-dst
+set url protocol websense
+exit
+set policy id 34 name "all-deny" from "Trust" to "Untrust"  "Any" "Any" "ANY" permit log 
+set policy id 34 disable
+set policy id 34
+exit
+set policy id 77 from "Trust" to "Untrust"  "Any" "MIP(172.16.0.254)" "ANY" deny log 
+set policy id 77 disable
+set policy id 77
+exit
+set policy id 68 from "Trust" to "Untrust"  "192.168.1.100/32" "MIP(172.16.0.254)" "ANY" permit log 
+set policy id 68
+exit
+set policy id 16 from "Trust" to "Untrust"  "192.168.1.100/32" "200.200.200.200/32" "ANY" permit log 
+set policy id 16
+exit
+set policy id 17 from "Trust" to "Untrust"  "192.168.1.101/32" "200.200.200.200/32" "ANY" nat src dip-id 4 permit log 
+set policy id 17
+exit
+set policy id 18 from "Trust" to "Untrust"  "192.168.1.102/32" "200.200.200.200/32" "ANY" nat src dip-id 5 permit log 
+set policy id 18
+exit
+set policy id 19 from "Trust" to "Untrust"  "192.168.1.103/32" "200.200.200.200/32" "ANY" nat src permit log 
+set policy id 19
+exit
+set policy id 23 from "Trust" to "Untrust"  "192.168.1.100/32" "100.100.100.111/32" "ANY" nat dst ip 200.200.200.202 permit log 
+set policy id 23
+exit
+set policy id 48 from "Trust" to "Untrust"  "192.168.1.100/32" "111.111.111.111/32" "NTP" nat dst ip 200.200.200.200 port 80 permit log 
+set policy id 48
+exit
+set policy id 25 from "Trust" to "Untrust"  "192.168.1.100/32" "10.0.0.120/32" "ANY" permit log 
+set policy id 25
+exit
+set policy id 26 from "Trust" to "Untrust"  "192.168.1.104/32" "10.0.0.120/32" "ANY" nat src dip-id 4 permit log 
+set policy id 26
+exit
+set policy id 27 from "Trust" to "Untrust"  "192.168.1.105/32" "10.0.0.120/32" "ANY" nat src dip-id 5 permit log 
+set policy id 27
+exit
+set policy id 28 from "Trust" to "Untrust"  "192.168.1.106/32" "10.0.0.120/32" "ANY" nat src permit log 
+set policy id 28
+exit
+set policy id 31 from "Trust" to "Untrust"  "192.168.1.100/32" "100.100.100.112/32" "ANY" nat dst ip 10.0.0.102 permit log 
+set policy id 31
+exit
+set policy id 49 from "Trust" to "Untrust"  "192.168.1.101/32" "111.111.111.112/32" "NTP" nat dst ip 10.0.0.104 port 80 permit log 
+set policy id 49
+exit
+set policy id 32 from "Trust" to "Untrust"  "172.16.0.100/32" "200.200.200.200/32" "ANY" permit log 
+set policy id 32
+exit
+set policy id 33 from "Trust" to "Untrust"  "172.16.0.107/32" "200.200.200.200/32" "ANY" nat src dip-id 4 permit log 
+set policy id 33
+exit
+set policy id 35 from "Trust" to "Untrust"  "172.16.0.108/32" "200.200.200.200/32" "ANY" nat src dip-id 5 permit log 
+set policy id 35
+exit
+set policy id 36 from "Trust" to "Untrust"  "172.16.0.109/32" "200.200.200.200/32" "ANY" nat src permit log 
+set policy id 36
+exit
+set policy id 38 from "Trust" to "Untrust"  "172.16.0.100/32" "100.100.100.113/32" "ANY" nat dst ip 200.200.200.202 permit log 
+set policy id 38
+exit
+set policy id 50 from "Trust" to "Untrust"  "172.16.0.100/32" "111.111.111.113/32" "NTP" nat dst ip 200.200.200.204 port 80 permit log 
+set policy id 50
+exit
+set policy id 39 from "Trust" to "Untrust"  "172.16.0.100/32" "10.0.0.120/32" "ANY" permit log 
+set policy id 39
+exit
+set policy id 40 from "Trust" to "Untrust"  "172.16.0.110/32" "10.0.0.120/32" "ANY" nat src dip-id 4 permit log 
+set policy id 40
+exit
+set policy id 41 from "Trust" to "Untrust"  "172.16.0.111/32" "10.0.0.120/32" "ANY" nat src dip-id 5 permit log 
+set policy id 41
+exit
+set policy id 42 from "Trust" to "Untrust"  "172.16.0.112/32" "10.0.0.120/32" "ANY" nat src permit log 
+set policy id 42
+exit
+set policy id 44 from "Trust" to "Untrust"  "172.16.0.100/32" "100.100.100.114/32" "ANY" nat dst ip 10.0.0.121 permit log 
+set policy id 44
+exit
+set policy id 51 from "Trust" to "Untrust"  "172.16.0.100/32" "111.111.111.114/32" "NTP" nat dst ip 10.0.0.123 port 80 permit log 
+set policy id 51
+exit
+set policy id 74 from "Trust" to "Trust"  "Any" "Any" "ANY" deny log 
+set policy id 74 disable
+set policy id 74
+exit
+set policy id 14 from "Trust" to "Trust"  "192.168.1.100/32" "172.16.0.111/32" "ANY" nat dst ip 200.200.200.201 permit log 
+set policy id 14
+exit
+set policy id 70 from "Untrust" to "Trust"  "Any" "Any" "ANY" deny log 
+set policy id 70 disable
+set policy id 70
+exit
+set policy id 66 from "Untrust" to "Trust"  "8.8.8.8/32" "192.168.1.222/32" "ANY" deny log 
+set policy id 66
+exit
+set policy id 15 from "Untrust" to "Trust"  "Any" "Any" "ANY" permit log 
+set policy id 15
+exit
+set policy id 30 from "Trust" to "Trust"  "192.168.1.100/32" "172.16.0.112/32" "ANY" nat dst ip 10.0.0.101 permit log 
+set policy id 30
+exit
+set policy id 37 from "Trust" to "Trust"  "172.16.0.100/32" "172.16.0.113/32" "ANY" nat dst ip 200.200.200.201 permit log 
+set policy id 37
+exit
+set policy id 47 from "Trust" to "Trust"  "172.16.0.100/32" "172.16.0.114/32" "ANY" nat dst ip 10.0.0.120 permit log 
+set policy id 47
+exit
+set policy id 52 name "dst-_src-nat" from "Trust" to "Trust"  "192.168.1.100/32" "172.16.0.10/32" "ANY" nat src dst ip 211.211.211.211 permit log 
+set policy id 52
+exit
+set policy id 55 name "dst-_src-nat" from "Trust" to "Trust"  "192.168.1.100/32" "172.16.0.11/32" "ANY" nat src dst ip 10.0.0.105 permit log 
+set policy id 55
+exit
+set policy id 54 name "dst-_src-nat" from "Trust" to "Trust"  "172.16.0.100/32" "172.16.0.12/32" "ANY" nat src dst ip 211.211.211.211 permit log 
+set policy id 54
+exit
+set policy id 56 name "dst-_src-nat" from "Trust" to "Trust"  "192.168.1.100/32" "172.16.0.13/32" "ANY" nat src dst ip 10.0.0.124 permit log 
+set policy id 56
+exit
+set policy id 76 from "Untrust" to "Untrust"  "Any" "Any" "ANY" deny log 
+set policy id 76
+exit
+set policy id 78 from "Trust" to "Untrust"  "192.168.4.100/32" "200.200.200.200/32" "src_60000-dst_80" permit log 
+set policy id 78
+exit
+set policy id 79 from "Trust" to "Untrust"  "192.168.5.100/32" "200.200.200.200/32" "src_60000-dst_80" nat src dip-id 4 permit log 
+set policy id 79
+exit
+set policy id 80 from "Trust" to "Untrust"  "192.168.1.100/32" "22.22.22.22/32" "ANY" permit log 
+set policy id 80
+exit
+set policy id 81 from "DMZ1" to "Trust"  "172.30.1.222/32" "192.168.1.100/32" "ANY" deny log 
+set policy id 81
+exit
+set policy id 82 from "DMZ1" to "Trust"  "Any" "Any" "ANY" permit log 
+set policy id 82
+exit
+set policy id 83 from "DMZ2" to "Trust"  "172.30.2.222/32" "192.168.1.100/32" "ANY" deny log 
+set policy id 83
+exit
+set policy id 84 from "DMZ2" to "Trust"  "Any" "Any" "ANY" permit log 
+set policy id 84
+exit
+set policy id 85 from "DMZ1" to "Untrust"  "172.30.1.222/32" "8.8.8.8/32" "ANY" deny log 
+set policy id 85
+exit
+set policy id 86 from "DMZ1" to "Untrust"  "Any" "Any" "ANY" permit log 
+set policy id 86
+exit
+set policy id 87 from "DMZ2" to "Untrust"  "172.30.2.222/32" "8.8.8.8/32" "ANY" deny log 
+set policy id 87
+exit
+set policy id 88 from "DMZ2" to "Untrust"  "Any" "Any" "ANY" permit log 
+set policy id 88
+exit
+set policy id 89 from "Untrust" to "DMZ1"  "8.8.8.8/32" "172.30.1.222/32" "ANY" deny log 
+set policy id 89
+exit
+set policy id 90 from "Untrust" to "DMZ1"  "Any" "Any" "ANY" permit log 
+set policy id 90
+exit
+set policy id 91 from "Untrust" to "DMZ2"  "8.8.8.8/32" "172.30.2.222/32" "ANY" deny log 
+set policy id 91
+exit
+set policy id 92 from "Untrust" to "DMZ2"  "Any" "Any" "ANY" permit log 
+set policy id 92
+exit
+set policy id 93 from "DMZ1" to "DMZ2"  "Any" "Any" "ANY" permit log 
+set policy id 93
+exit
+set policy id 96 from "Trust" to "DMZ1"  "192.168.1.100/32" "172.30.1.222/32" "ANY" deny log 
+set policy id 96
+exit
+set policy id 94 from "Trust" to "DMZ1"  "Any" "Any" "ANY" permit log 
+set policy id 94
+exit
+set policy id 97 from "Trust" to "DMZ2"  "192.168.1.100/32" "172.30.2.222/32" "ANY" deny log 
+set policy id 97
+exit
+set policy id 95 from "Trust" to "DMZ2"  "Any" "Any" "ANY" permit log 
+set policy id 95
+exit
+set pppoe name "test"
+set pppoe name "test" username "ssguser" password "Rjjfzn4bNZXaRnsaxnC/wC8kaLnfvW2T3g=="
+set pppoe name "test" ppp lcp-echo-retries 10
+set pppoe name "test" ppp lcp-echo-timeout 180
+set syslog config "needleworkhost.local"
+set syslog config "needleworkhost.local" facilities local0 local0
+set syslog config "needleworkhost.local" log traffic
+set syslog config "needleworkhost.local" transport tcp
+set syslog enable
+set syslog backup enable
+set nsmgmt bulkcli reboot-timeout 60
+set ssh version v2
+set ssh enable
+set config lock timeout 5
+unset license-key auto-update
+set telnet client enable
+set ntp server "needleworkhost.local"
+set ntp server src-interface "ethernet0/3"
+set ntp server backup1 "ntp2.jst.mfeed.ad.jp"
+set ntp server backup1 src-interface "ethernet0/3"
+set ntp server backup2 "ntp3.jst.mfeed.ad.jp"
+set ntp server backup2 src-interface "ethernet0/3"
+set ntp interval 5
+set snmp port listen 161
+set snmp port trap 162
+set snmpv3 local-engine id "0162112009012460"
+set vrouter "untrust-vr"
+set route 0.0.0.0/0 gateway 192.168.81.254
+set route 0.0.0.0/0 gateway 192.168.79.254
+exit
+set vrouter "trust-vr"
+unset add-default-route
+set route 0.0.0.0/0 interface ethernet0/0 gateway 10.0.0.1
+set route 192.168.0.0/16 interface bgroup0 gateway 172.16.0.1
+set route 172.30.1.0/24 interface ethernet0/5.2 gateway 172.16.20.1 tag 20
+set route 172.30.2.0/24 interface ethernet0/5.1 gateway 172.16.30.1 tag 30
+set route 192.168.79.0/24 interface ethernet0/3 gateway 192.168.79.254 metric 100
+exit
+set vrouter "untrust-vr"
+exit
+set vrouter "trust-vr"
+exit
