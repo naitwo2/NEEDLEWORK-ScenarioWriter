@@ -8,6 +8,15 @@ src_fw = []
 # src-fwのリストの生成
 
 
+def decide_src_fw(policy, append_list, src_if):
+    for if_ip_c in absorbdict.if_ip_dict:
+        if src_if.replace('"', '') == if_ip_c['if_name'].replace('"', ''):
+            data = str(
+                if_ip_c['ip_address'].split('/')[0])
+            multiple.handle_multiple_ip(
+                policy, append_list, data)
+
+
 def handle_src_fw():
     global src_fw
     append_list = src_fw
@@ -25,62 +34,17 @@ def handle_src_fw():
                             else:
                                 continue
                         max_keys = max(longest_match, key=longest_match.get)
-                        src_if = []
-                        src_if += [max_keys]
-                        for src_if_c in src_if:
-                            for if_ip_c in absorbdict.if_ip_dict:
-                                if src_if_c.replace('"', '') == if_ip_c['if_name'].replace('"', ''):
-                                    data = str(
-                                        if_ip_c['ip_address'].split('/')[0])
-                                    multiple.handle_multiple_ip(
-                                        policy, append_list, data)
-                                    break
+                        src_if = max_keys
+                        decide_src_fw(policy, append_list, src_if)
+                        break
                     elif policy['src_ip'].strip(')"').split('(')[1] == vip_c['if_name'] and vip_c['global_ip'] == "interface-ip":
-                        src_if = []
-                        src_if += [policy['src_ip'].strip(')"').split('(')[1]]
-                        for src_if_c in src_if:
-                            for if_ip_c in absorbdict.if_ip_dict:
-                                if src_if_c.replace('"', '') == if_ip_c['if_name'].replace('"', ''):
-                                    data = str(
-                                        if_ip_c['ip_address'].split('/')[0])
-                                    multiple.handle_multiple_ip(
-                                        policy, append_list, data)
-                                    break
+                        src_if = policy['src_ip'].strip(')"').split('(')[1]
+                        decide_src_fw(policy, append_list, src_if)
                         break
                 break
             elif policy['src_zone'] == if_zone['zone_name']:
-                src_if = []
-                src_if += [if_zone['if_name']]
-                for src_if_c in src_if:
-                    for if_ip_c in absorbdict.if_ip_dict:
-                        if src_if_c.replace('"', '') == if_ip_c['if_name'].replace('"', ''):
-                            data = str(if_ip_c['ip_address'].split('/')[0])
-                            multiple.handle_multiple_ip(
-                                policy, append_list, data)
-                            break
-                        else:
-                            flag = False
-                            for if_zone in absorbdict.if_zone_dict:
-                                if policy['src_zone'] == if_zone['zone_name']:
-                                    flag = True
-                                    break
-                                else:
-                                    continue
-            else:
-                flag = False
-                for if_zone in absorbdict.if_zone_dict:
-                    if policy['src_zone'] == if_zone['zone_name']:
-                        flag = True
-                        break
-                    else:
-                        continue
-        else:
-            if not flag:
-                data = str("NaN")
-                print('送信元ゾーンの' + policy['dst_zone'] +
-                      'が割り当てられたIF,またはそのIFにIPがありません')
-                print('policy_id = %sの出力をスキップしました' % policy['policy_id'])
-                multiple.handle_multiple_ip(policy, append_list, data)
+                src_if = if_zone['if_name']
+                decide_src_fw(policy, append_list, src_if)
 
 
 handle_src_fw()

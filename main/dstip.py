@@ -12,7 +12,8 @@ dst_ip = []
 def select_dst_ip_from_scope_ip(policy, scope_ip):
     global dst_ip
     service_name = policy['protocol']
-    judge_service_name(service_name)
+    multiple.confirm_service_element(service_name)
+    service_element_num = multiple.service_element_num
     if policy['src_ip'] == '"Any"' and policy['src_zone'] != '"Untrust"':
         dst_ip += [str(scope_ip[1]), str(scope_ip[-2]),
                    str(scope_ip[-2]), str(scope_ip[1])] * service_element_num
@@ -25,8 +26,9 @@ def select_dst_ip_from_scope_ip(policy, scope_ip):
                 dst_ip += [str(scope_ip[1]), str(scope_ip[-2])
                            ] * service_element_num
     else:
-        src_address_name = policy['src_ip']
-        judge_src_address_name(src_address_name)
+        address_name = policy['src_ip']
+        multiple.judge_src_address_name(address_name)
+        src_address_element_num = multiple.src_address_element_num
         dst_ip += [str(scope_ip[1]), str(scope_ip[-2])] * \
             service_element_num * src_address_element_num
 
@@ -174,7 +176,6 @@ def handle_implicit_any_ip(policy):
     else:
         dst_zone = policy['dst_zone']
         # dst_zoneがif_zoneで使用されていないことも想定する
-        # TODO:スキップしないようにする
         dst_if_route_network_range(policy, dst_zone)
         if dst_ip_list != []:
             exclude_dst_ip_list_from_route_network(dst_ip_list, route_network)
@@ -192,105 +193,41 @@ def src_ip_element(policy, data, service_element_num):
     global dst_ip
     if policy['src_ip'] == '"Any"' and policy['src_zone'] != '"Untrust"':
         dst_ip += [data] * service_element_num * 2
-    elif "VIP" in policy['src_ip'] and policy['protocol'] == '"ANY"':
+    elif "VIP" in policy['src_ip']:
         for vip_c in absorbdict.vip_dict:
             if policy['src_ip'].strip(')"').split('(')[1] == vip_c['if_name'] and vip_c['global_ip'] == "interface-ip":
                 dst_ip += [data] * service_element_num
             elif policy['src_ip'].strip(')"').split('(')[1] == vip_c['global_ip']:
                 dst_ip += [data] * service_element_num
+            continue
     else:
-        src_address_name = policy['src_ip']
-        judge_src_address_name(src_address_name)
+        address_name = policy['src_ip']
+        multiple.judge_src_address_name(address_name)
+        src_address_element_num = multiple.src_address_element_num
         dst_ip += [data] * service_element_num * src_address_element_num
 
 
 def handle_dst_ip_is_vip(policy, service_element_num):
+    vip_list = []
+    # ANYであればすべてのIPをvip_listに加えその要素数分だけsrc_ip_element()を行う
+    # その他はvip_c['service_name']とpolicy['protocol']が一致しているIPのみ加える
     for vip_c in absorbdict.vip_dict:
         if policy['dst_ip'].strip(')"').split('(')[1] == vip_c['if_name']:
             if vip_c['global_ip'] == "interface-ip" and policy['protocol'] == '"ANY"':
-                data = str(vip_c['private_ip'])
-                src_ip_element(policy, data, service_element_num)
-            else:
-                handle_vip_dst_port(policy)
-                break
+                vip_list += [str(vip_c['private_ip'])]
+                continue
+            elif vip_c['global_ip'] == "interface-ip" and vip_c['service_name'] == policy['protocol']:
+                vip_list += [str(vip_c['private_ip'])]
         elif policy['dst_ip'].strip(')"').split('(')[1] == vip_c['global_ip']:
             if policy['protocol'] == '"ANY"':
-                data = str(vip_c['private_ip'])
-                src_ip_element(policy, data, service_element_num)
-            else:
-                handle_vip_dst_port(policy)
-                break
-
-
-def handle_vip_dst_port(policy):
-    global dst_ip
-    for service_c in absorbdict.service_dict:
-        if policy.get('dst_nat_port') is not None:
-            vip_dst_port = policy['dst_nat_port']
-        elif policy['protocol'] == '"FTP"':
-            vip_dst_port = '21'
-        elif policy['protocol'] == '"HTTP"':
-            vip_dst_port = '80'
-        elif policy['protocol'] == '"NTP"':
-            vip_dst_port = '123'
-        elif policy['protocol'] == '"DNS"':
-            vip_dst_port = '53'
-        elif service_c['service_name'] == policy['protocol']:
-            vip_dst_port = service_c['dst_port_num'].split('-')[0]
-        else:
-            continue
+                vip_list += [str(vip_c['private_ip'])]
+                continue
+            elif vip_c['service_name'] == policy['protocol']:
+                vip_list += [str(vip_c['private_ip'])]
     else:
-        decide_dst_vip_ip(policy, vip_dst_port)
-
-
-def decide_dst_vip_ip(policy, vip_dst_port):
-    for vip_c in absorbdict.vip_dict:
-        if vip_dst_port == vip_c['port_num'] and policy['dst_ip'].strip(')"').split('(')[1] == vip_c['global_ip']:
-            data = str(vip_c['private_ip'])
+        for i in range(len(vip_list)):
+            data = vip_list[i]
             src_ip_element(policy, data, service_element_num)
-            break
-        elif vip_dst_port == vip_c['port_num'] and policy['dst_ip'].strip(')"').split('(')[1] == vip_c['if_name'] and vip_c['global_ip'] == "interface-ip":
-            data = str(vip_c['private_ip'])
-            src_ip_element(policy, data, service_element_num)
-            break
-    else:
-        data = str("NaN")
-        print('vipの設定をされたポートは現在対応していません')
-        # print('詳しくはREADMEでご確認ください')
-        print('policy_id = %sの出力をスキップしました' % policy['policy_id'])
-        src_ip_element(policy, data, service_element_num)
-
-
-# groupで定義されたものか判定する関数
-def judge_service_name(service_name):
-    global service_element_num
-    for group_service_c in absorbdict.group_service_dict:
-        if group_service_c['group_service_name'] == service_name:
-            group_service_name = group_service_c['group_service_name']
-            multiple.count_group_service_element(group_service_name)
-            service_element_num = multiple.service_element_num
-            break
-        else:
-            service_element_num = 1
-            continue
-    else:
-        return service_element_num
-
-
-# groupで定義されたものか判定する関数
-def judge_src_address_name(src_address_name):
-    global src_address_element_num
-    for group_address_c in absorbdict.group_address_dict:
-        if group_address_c['group_name'] == src_address_name:
-            group_name = group_address_c['group_name']
-            multiple.count_src_group_address_element(group_name)
-            src_address_element_num = multiple.src_address_element_num
-            break
-        else:
-            src_address_element_num = 1
-            continue
-    else:
-        return src_address_element_num
 
 
 def handle_dst_ip_is_any(policy, dst_zone):
@@ -330,17 +267,34 @@ def confirm_dst_if(policy, dst_zone):
     return dst_if
 
 
+def handle_dst_ip_list(policy, dst_ip_list):
+    global dst_ip
+    src_address = policy['src_ip']
+    multiple.confirm_src_address_element(policy, src_address)
+    src_element_num = multiple.src_address_element_num
+    service_name = policy['protocol']
+    multiple.confirm_service_element(service_name)
+    for n in range(src_element_num):
+        for data in dst_ip_list:
+            # この辺のデータを変更する
+            dst_ip += [data] * multiple.service_element_num
+
+
 def judge_dst_ip_is_group_address(policy, service_element_num):
     if len(absorbdict.group_address_dict) >= 2:
+        dst_ip_list = []
         for group_address_c in absorbdict.group_address_dict:
             if policy['dst_ip'] == group_address_c['group_name']:
                 dst_address_name = group_address_c['address_name']
                 for address_c in absorbdict.address_dict:
                     if dst_address_name == address_c['address_name']:
-                        data = str(address_c['ip_address'])
-                        src_ip_element(policy, data, service_element_num)
+                        dst_ip_list += [str(address_c['ip_address'])]
+                        continue
         else:
-            address_dst_ip(policy, service_element_num)
+            if dst_ip_list != []:
+                handle_dst_ip_list(policy, dst_ip_list)
+            else:
+                address_dst_ip(policy, service_element_num)
     else:
         address_dst_ip(policy, service_element_num)
 
@@ -391,28 +345,10 @@ def handle_dst_ip(policy, service_element_num):
 
 
 def handle_multiple_element():
-    global service_element_num
-    global src_address_element_num
     for policy in absorbdict.policy_dict:
-        # group_address & group_serviceが両方とも使用されている場合
-        if len(absorbdict.group_address_dict) >= 2 and len(absorbdict.group_service_dict) >= 2:
-            service_name = policy['protocol']
-            src_address_name = policy['src_ip']
-            judge_service_name(service_name)
-            judge_src_address_name(src_address_name)
-        # group_addressが使用されている場合
-        elif len(absorbdict.group_address_dict) >= 2:
-            service_element_num = 1
-            src_address_name = policy['src_ip']
-            judge_src_address_name(src_address_name)
-        # group_serviceが使用されている場合
-        elif len(absorbdict.group_service_dict) >= 2:
-            service_name = policy['protocol']
-            src_address_element_num = 1
-            judge_service_name(service_name)
-        # Group_dictがない場合
-        else:
-            service_element_num = src_address_element_num = 1
+        service_name = policy['protocol']
+        multiple.confirm_service_element(service_name)
+        service_element_num = multiple.service_element_num
         handle_dst_ip(policy, service_element_num)
 
 

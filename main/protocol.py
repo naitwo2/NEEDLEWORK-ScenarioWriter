@@ -8,9 +8,8 @@ protocol_udp = []
 
 # protocolのリストの生成
 
-# その他設定で用いられるプロトコルがあれば別途実装
 
-
+# その他設定で用いられるプロトコルがあれば別途実装する
 def handle_protocol_icmp():
     global protocol_icmp
     append_list = protocol_icmp

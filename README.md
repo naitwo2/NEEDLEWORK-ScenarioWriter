@@ -66,27 +66,24 @@ set policy id 98 name "vip" from "Trust" to "Untrust" "Any" "VIP(ethernet0/0)" "
 * 設定したserviceをポリシーで使用した場合、送信元ポートは開始ポートのみをcsvに出力します。
 * 設定したserviceをポリシーで使用した場合、宛先ポートは終了ポートのみをcsvに出力します。
 * デフォルトで登録されている下記サービスの宛先ポートは以下の通りです。
+  * PING(icmp)
   * FTP（udp 21)
   * SMTP(tcp 25)
   * MAIL(tcp 25)
   * DNS(tcp,udp 53)
-  * HTTP(tcp 80)   
+  * HTTP(tcp 80)
+  * POP3(tcp 110)   
   * NTP(tcp,udp 123)
   * NBDS(udp 138)
+  * IMAP(tcp 143)
   * SNMP(tcp,udp 161)
+  * LDAP(tcp 389)
   * HTTPS(tcp 443)
   * SYSLOG(udp 514)
+  * WINFRAME(tcp 1494)
 * ポリシーのServiceがANYの場合、csvに出力される宛先ポート番号は下記の通りです。
   * icmp:なし
   * tcp,udp:65535
-* group-serviceにgroup-serviceを追加したserviceをポリシーで使用している場合、group-serviceに含まれる最初のserviceで使用されているポート番号のみを出力します。 <br>
-例：下記のように設定がされている場合、`tcp 1010`がcsvに出力されます。
-```
- group-service
- 　-  group-service（tcp 1010 , tcp 2020 , udp 100 , udp 200）
- 　-  service（tcp 8080）
- 　-  service（tcp 8081）
-```
 
 ## その他
 * インターフェースに割り当てられていないゾーンがポリシーで使用されている場合、正常にcsvが出力されない恐れがありますのでご注意ください。

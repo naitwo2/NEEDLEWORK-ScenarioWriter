@@ -35,7 +35,7 @@ def confirm_service_name_ping(policy, service_name_list):
 
 
 # TODO:Any Any ANYの前のservice_nameにPINGがある場合はicmpでは出力しないようにする
-# しかしAny Any ANYの前で出力されていることを確認する
+# TODO:しかしAny Any ANYの前で出力されている前提
 def implicit_rule_icmp_expect(policy):
     service_name_list = []
     for pre_policy in absorbdict.policy_dict:
@@ -156,6 +156,24 @@ def handle_expect_of_changed_if(policy, append_list):
                 decide_after_dst_if(policy, dst_ip)
                 after_dst_zone(policy, after_dst_if, append_list)
                 break
+                #longest_match = {}
+                # for route_c in absorbdict.route_dict:
+                #    if ipaddress.ip_address(vip_c['private_ip']) in ipaddress.ip_network(route_c['network_address'], strict=False):
+                #        a = {
+                #            route_c['if_name']: route_c['network_address'].split('/')[1]}
+                #        longest_match.update(a)
+                # else:
+                #    flag = False
+                #    for if_ip_c in absorbdict.if_ip_dict:
+                #        if longest_match.keys == if_ip_c['if_name'] and if_ip_c.get('ip_address') is not None:
+                #            flag = True
+                #    else:
+                #        if not flag:
+                #            max_keys = max(
+                #                longest_match, key=longest_match.get)
+                #            after_dst_if = max_keys.replace('"', '')
+                #            after_dst_zone(
+                #                policy, after_dst_if, append_list)
     elif policy['src_zone'] == policy['dst_zone']:
         same_zone_block(policy, append_list)
     else:
@@ -167,6 +185,44 @@ def handle_expect():
     append_list = expect
     for policy in absorbdict.policy_dict:
         handle_expect_of_changed_if(policy, append_list)
+        '''
+            # TODO:longest_matchの算出ロジックがバラバラなので統一予定
+            address = str(vip_c['private_ip'])
+            ip_network = ipaddress.ip_network(ipaddress.ip_address(address), strict=False)
+            for route_i, route_c in enumerate (absorbdict.route_dict):
+                routing_network = ipaddress.ip_network(route_c['network_address'])
+                if ip_network.subnet_of(routing_network) is True:
+                    after_dst_if = route_c['if_name']
+                    for if_ip_c in absorbdict.if_ip_dict:
+                        if after_dst_if.replace('"', '') == if_ip_c['if_name'].replace('"', '') and if_ip_c.get('ip_address') != None:
+                            after_dst_zone(policy, after_dst_if)
+            '''
+        '''
+            if len(absorbdict.if_nat_dict) >= 1:
+                flag = False
+                for if_zone in absorbdict.if_zone_dict:
+                    if policy['src_zone'] == if_zone['zone_name']:
+                        src_if = if_zone['if_name']
+                        for if_nat_c in absorbdict.if_nat_dict:
+                            if src_if.replace('"', '') == if_nat_c['if_name'].replace('"', ''):
+                                flag = True
+                                for if_zone in absorbdict.if_zone_dict:
+                                    if policy['dst_zone'] == if_zone['zone_name']:
+                                        after_src_if = if_zone['if_name'].replace('"', '')
+                                        after_src_zone(policy, after_src_if, append_list)
+                else:
+                    if not flag:
+                        if policy['src_zone'] == policy['dst_zone']:
+                            same_zone_block(policy, append_list)
+                        else:
+                            if "permit" == policy['expect']:
+                                data = str("pass")
+                                multiple.handle_multiple_ip(policy, append_list, data)
+                            elif "deny" == policy['expect']:
+                                data = str("drop")
+                                multiple.handle_multiple_ip(policy, append_list, data)
+            else:
+            '''
 
 
 handle_expect()
@@ -184,3 +240,7 @@ def handle_expect_icmp():
 
 
 handle_expect_icmp()
+print(len(expect))
+#print(expect)
+print(len(expect_icmp))
+#print(expect_icmp)
