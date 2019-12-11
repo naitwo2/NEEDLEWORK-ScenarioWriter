@@ -87,7 +87,7 @@ set policy id 98 name "vip" from "Trust" to "Untrust" "Any" "VIP(ethernet0/0)" "
 
 ## その他
 * インターフェースに割り当てられていないゾーンがポリシーで使用されている場合、正常にcsvが出力されない恐れがありますのでご注意ください。
-* マルチセルポリシーには対応していません。
+* マルチセルポリシーは現在対応しておりません。
 * csvに非出力のポリシーは理由がメッセージとして出力されます。
 
 # 環境
@@ -132,12 +132,14 @@ set policy id 98 name "vip" from "Trust" to "Untrust" "Any" "VIP(ethernet0/0)" "
     * `pip install pandas==0.25.0`
 9. 4.で作成されたディレクトリに移動します。
     * `cd 4.で作成されたディレクトリ`
-10.  CLIにてツールを使用します。
+10. CLIにてツールを使用します。
     * `python main¥gencsv.py file_name disable_policy_output`   
       * file_name:ファイアウォールのコンフィグファイルを相対パスまたは絶対パスで入力、またはドラッグ&ドロップします。
       * disable_policy_output:コンフィグファイルで有効化していないポリシーをcsvに出力するかを決定します。
         * `y` : 出力する
         * `n` : 出力しない
+
+2回目以降使用する場合はコマンドで`git pull origin master`を入力後項番10を入力してください。
 
 # お問い合わせ
 * 改善・要望等ございましたらpull requestをお願いします。
