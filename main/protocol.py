@@ -17,7 +17,7 @@ def handle_protocol_icmp():
         if policy['protocol'] == '"ANY"':
             data = str("icmp")
             multiple.handle_multiple_ip(policy, append_list, data)
-        elif policy['protocol'] == '"PING"':
+        elif policy['protocol'] == '"PING"' or policy['protocol'] == '"ICMP-ANY"':
             data = str("icmp")
             multiple.handle_multiple_ip(policy, append_list, data)
         else:
@@ -43,7 +43,7 @@ def handle_protocol_tcp():
         if policy['protocol'] == '"ANY"':
             data = str("tcp")
             multiple.handle_multiple_ip(policy, append_list, data)
-        elif policy['protocol'] == '"PING"':
+        elif policy['protocol'] == '"PING"' or policy['protocol'] == '"ICMP-ANY"':
             data = str("")
             multiple.handle_multiple_ip(policy, append_list, data)
         else:
@@ -69,7 +69,7 @@ def handle_protocol_udp():
         if policy['protocol'] == '"ANY"':
             data = str("udp")
             multiple.handle_multiple_ip(policy, append_list, data)
-        elif policy['protocol'] == '"PING"':
+        elif policy['protocol'] == '"PING"' or policy['protocol'] == '"ICMP-ANY"':
             data = str("")
             multiple.handle_multiple_ip(policy, append_list, data)
         else:
