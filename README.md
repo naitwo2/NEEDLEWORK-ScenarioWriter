@@ -115,11 +115,13 @@ set policy id 98 name "vip" from "Trust" to "Untrust" "Any" "VIP(ethernet0/0)" "
 
 # ツールの使用方法
 
-0. CLIを起動します。
+0. コマンドプロンプトを起動します。
 1. 作業用ディレクトリを作成します。
     * `mkdir ディレクトリ名`
+        * サンプルコマンド：`mkdir C:\test`
 2. 作成したディレクトリに移動します。
     * `cd ディレクトリ名`
+        * サンプルコマンド：`cd C:\test`
 3. 作成したディレクトリに本リポジトリをcloneします。
     * `git clone https://github.com/ap-communications/NEEDLEWORK-ScenarioWriter.git`
 4. 作成されたディレクトリに移動します。
@@ -128,17 +130,21 @@ set policy id 98 name "vip" from "Trust" to "Untrust" "Any" "VIP(ethernet0/0)" "
     * `cd`
 6. 5.で表示したパスを環境変数に設定します。
     * `setx PYTHONPATH 5.で表示したパス`
+        * サンプルコマンド：`setx PYTHONPATH C:\test\NEEDLEWORK-ScenarioWriter`
 7. PCを再起動します。
-8. ツールに使用する外部ライブラリをインストールします。
-    * `pip install pandas==0.25.0`
-9. 4.で作成されたディレクトリに移動します。
+8. コマンドプロンプトを起動します。
+9. ツールに使用する外部ライブラリをインストールします。
+    * `python -m pip install pandas==0.25.0`
+10. 4.で作成されたディレクトリに移動します。
     * `cd 4.で作成されたディレクトリ`
-10. CLIにてツールを使用します。
-    * `python main¥gencsv.py file_name disable_policy_output`   
+        * サンプルコマンド：`cd C:\test\NEEDLEWORK-ScenarioWriter`
+11. コマンドプロンプトにて以下のコマンドを実行し、シナリオCSVを出力します。
+    * `python main\gencsv.py file_name disable_policy_output`   
       * file_name:ファイアウォールのコンフィグファイルを相対パスまたは絶対パスで入力、またはドラッグ&ドロップします。
       * disable_policy_output:コンフィグファイルで有効化していないポリシーをcsvに出力するかを決定します。
         * `y` : 出力する
         * `n` : 出力しない
+        * サンプルコマンド：`python main\gencsv.py SSGconfig.txt y`
 
 2回目以降使用する場合はコマンドで`git pull origin master`を入力後項番10を入力してください。
 
