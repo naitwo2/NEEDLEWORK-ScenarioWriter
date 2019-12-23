@@ -16,7 +16,7 @@ def select_dst_ip_from_scope_ip(policy, scope_ip):
     service_element_num = multiple.service_element_num
     if policy['src_ip'] == '"Any"' and policy['src_zone'] != '"Untrust"':
         dst_ip += [str(scope_ip[1]), str(scope_ip[-2]),
-                   str(scope_ip[-2]), str(scope_ip[1])] * service_element_num
+                   str(scope_ip[1]), str(scope_ip[-2])] * service_element_num
     elif "VIP" in policy['src_ip'] and policy['protocol'] == '"ANY"':
         for vip_c in absorbdict.vip_dict:
             if policy['src_ip'].strip(')"').split('(')[1] == vip_c['if_name'] and vip_c['global_ip'] == "interface-ip":
@@ -175,18 +175,13 @@ def handle_implicit_any_ip(policy):
             pass
     else:
         dst_zone = policy['dst_zone']
-        # dst_zoneがif_zoneで使用されていないことも想定する
         dst_if_route_network_range(policy, dst_zone)
         if dst_ip_list != []:
             exclude_dst_ip_list_from_route_network(dst_ip_list, route_network)
             define_scope_ip(policy, network_address_list)
         else:
-            append_list = dst_ip
-            data = str("NaN")
-            print('%sから%sへのポリシーはpolicy_id = %sより前に存在しません' %
-                  (policy['src_zone'], policy['dst_zone'], policy['policy_id']))
-            print('policy_id = %sの出力をスキップしました' % policy['policy_id'])
-            multiple.handle_multiple_ip(policy, append_list, data)
+            dst_zone = policy['dst_zone']
+            handle_dst_ip_is_any(policy, dst_zone)
 
 
 def src_ip_element(policy, data, service_element_num):
@@ -233,28 +228,29 @@ def handle_dst_ip_is_vip(policy, service_element_num):
 def handle_dst_ip_is_any(policy, dst_zone):
     confirm_dst_if(policy, dst_zone)
     scope_ip = ipaddress.ip_network("4.4.4.4/32")
+    flag = False
     for route_c in absorbdict.route_dict:
         if dst_if.replace('"', '') == route_c['if_name'].replace('"', ''):
+            flag = True
             if route_c['network_address'] == "0.0.0.0/0":
                 continue
             elif ipaddress.IPv4Network(route_c['network_address']).num_addresses > ipaddress.IPv4Network(scope_ip).num_addresses:
                 scope_ip = ipaddress.ip_network(
                     route_c['network_address'])
                 continue
-            else:
-                continue
-            exclude_fw_ip_from_scope_ip(scope_ip)
-            define_scope_ip(policy, network_address_list)
-            break
     else:
-        for if_ip_c in absorbdict.if_ip_dict:
-            if dst_if.replace('"', '') == if_ip_c['if_name'] and if_ip_c['ip_address'] is not None:
-                if ipaddress.IPv4Network(if_ip_c['ip_address'], strict=False).num_addresses > ipaddress.IPv4Network(scope_ip).num_addresses:
-                    scope_ip = ipaddress.ip_network(
-                        if_ip_c['ip_address'], strict=False)
-                    break
-            else:
-                continue
+        if not flag:
+            for if_ip_c in absorbdict.if_ip_dict:
+                if dst_if.replace('"', '') == if_ip_c['if_name'] and if_ip_c['ip_address'] is not None:
+                    if ipaddress.IPv4Network(if_ip_c['ip_address'], strict=False).num_addresses > ipaddress.IPv4Network(scope_ip).num_addresses:
+                        scope_ip = ipaddress.ip_network(
+                            if_ip_c['ip_address'], strict=False)
+                        exclude_fw_ip_from_scope_ip(scope_ip)
+                        define_scope_ip(policy, network_address_list)
+                        break
+                else:
+                    continue
+        else:
             exclude_fw_ip_from_scope_ip(scope_ip)
             define_scope_ip(policy, network_address_list)
 
@@ -276,7 +272,6 @@ def handle_dst_ip_list(policy, dst_ip_list):
     multiple.confirm_service_element(service_name)
     for n in range(src_element_num):
         for data in dst_ip_list:
-            # この辺のデータを変更する
             dst_ip += [data] * multiple.service_element_num
 
 

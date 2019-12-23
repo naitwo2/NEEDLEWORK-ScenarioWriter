@@ -16,7 +16,7 @@ def select_src_ip_from_scope_ip(policy, scope_ip):
     service_element_num = multiple.service_element_num
     if policy['dst_ip'] == '"Any"' and policy['dst_zone'] != '"Untrust"':
         src_ip += [str(scope_ip[1]), str(scope_ip[-2]),
-                   str(scope_ip[1]), str(scope_ip[-2])] * service_element_num
+                   str(scope_ip[-2]), str(scope_ip[1])] * service_element_num
     elif "VIP" in policy['dst_ip'] and policy['protocol'] == '"ANY"':
         for vip_c in absorbdict.vip_dict:
             if policy['dst_ip'].strip(')"').split('(')[1] == vip_c['if_name'] and vip_c['global_ip'] == "interface-ip":
@@ -175,18 +175,13 @@ def handle_implicit_any_ip(policy):
             pass
     else:
         src_zone = policy['src_zone']
-        # src_zoneがif_zoneで使用されていないこと(route_networkが返ってこないこと)も想定する
         src_if_route_network_range(policy, src_zone)
         if src_ip_list != []:
             exclude_src_ip_list_from_route_network(src_ip_list, route_network)
             define_scope_ip(policy, network_address_list)
         else:
-            append_list = src_ip
-            data = str("NaN")
-            print(policy['src_zone'] + 'から' + policy['dst_zone'] +
-                  'へのポリシーは' + 'policy_id =' + policy['policy_id'] + 'より前に存在しません')
-            print('policy_id = %sの出力をスキップしました' % policy['policy_id'])
-            multiple.handle_multiple_ip(policy, append_list, data)
+            src_zone = policy['src_zone']
+            handle_src_ip_is_any(policy, src_zone)
 
 
 def dst_ip_element(policy, data, service_element_num):
@@ -233,28 +228,29 @@ def handle_src_ip_is_vip(policy, service_element_num):
 def handle_src_ip_is_any(policy, src_zone):
     confirm_src_if(policy, src_zone)
     scope_ip = ipaddress.ip_network("4.4.4.4/32")
+    flag = False
     for route_c in absorbdict.route_dict:
         if src_if.replace('"', '') == route_c['if_name'].replace('"', ''):
+            flag = True
             if route_c['network_address'] == "0.0.0.0/0":
                 continue
             elif ipaddress.IPv4Network(route_c['network_address']).num_addresses > ipaddress.IPv4Network(scope_ip).num_addresses:
                 scope_ip = ipaddress.ip_network(
                     route_c['network_address'])
                 continue
-            else:
-                continue
-            exclude_fw_ip_from_scope_ip(scope_ip)
-            define_scope_ip(policy, network_address_list)
-            break
     else:
-        for if_ip_c in absorbdict.if_ip_dict:
-            if src_if.replace('"', '') == if_ip_c['if_name'] and if_ip_c['ip_address'] is not None:
-                if ipaddress.IPv4Network(if_ip_c['ip_address'], strict=False).num_addresses > ipaddress.IPv4Network(scope_ip).num_addresses:
-                    scope_ip = ipaddress.ip_network(
-                        if_ip_c['ip_address'], strict=False)
-                    break
-            else:
-                continue
+        if not flag:
+            for if_ip_c in absorbdict.if_ip_dict:
+                if src_if.replace('"', '') == if_ip_c['if_name'] and if_ip_c['ip_address'] is not None:
+                    if ipaddress.IPv4Network(if_ip_c['ip_address'], strict=False).num_addresses > ipaddress.IPv4Network(scope_ip).num_addresses:
+                        scope_ip = ipaddress.ip_network(
+                            if_ip_c['ip_address'], strict=False)
+                        exclude_fw_ip_from_scope_ip(scope_ip)
+                        define_scope_ip(policy, network_address_list)
+                        break
+                else:
+                    continue
+        else:
             exclude_fw_ip_from_scope_ip(scope_ip)
             define_scope_ip(policy, network_address_list)
 

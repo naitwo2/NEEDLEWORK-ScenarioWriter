@@ -32,7 +32,7 @@ def handle_src_and_dst_nat(policy, append_list):
             handle_src_nat_ip_is_dst_fw(policy, append_list, dst_if)
 
 
-def handle_nat_if_and_protocol(policy, append_list):
+def handle_nat_if(policy, append_list):
     global flag
     flag = False
     for if_zone in absorbdict.if_zone_dict:
@@ -48,17 +48,35 @@ def handle_nat_if_and_protocol(policy, append_list):
                                 policy, append_list, dst_if)
             else:
                 # TODO:その他の法則性があれば修正する
-                if policy['protocol'] == '"NTP"' or policy['protocol'] == '"HTTP"':
-                    for address_c in absorbdict.address_dict:
-                        if policy['src_ip'].replace('"', '') == address_c['address_name'].replace('"', ''):
-                            ip_address = address_c['ip_address']
-                            for mip_c in absorbdict.mip_dict:
-                                if ip_address == mip_c['global_ip']:
-                                    flag = True
-                                    data = str(mip_c['private_ip'])
-                                    multiple.handle_multiple_ip(
-                                        policy, append_list, data)
+                # if policy['protocol'] == '"NTP"' or policy['protocol'] == '"HTTP"':
+                dst_zone = policy['dst_zone']
+                handle_src_nat_ip_is_mip(policy, append_list, dst_zone)
+                # for address_c in absorbdict.address_dict:
+                #    if policy['src_ip'].replace('"', '') == address_c['address_name'].replace('"', ''):
+                #        ip_address = address_c['ip_address']
+                #        for mip_c in absorbdict.mip_dict:
+                #            if ip_address == mip_c['global_ip']:
+                #                flag = True
+                #                data = str(mip_c['private_ip'])
+                #                multiple.handle_multiple_ip(
+                #                    policy, append_list, data)
     return flag
+
+
+def handle_src_nat_ip_is_mip(policy, append_list, dst_zone):
+    global flag
+    for if_zone in absorbdict.if_zone_dict:
+        if dst_zone == if_zone['zone_name']:
+            dst_if = if_zone['if_name']
+            for address_c in absorbdict.address_dict:
+                if policy['src_ip'].replace('"', '') == address_c['address_name'].replace('"', ''):
+                    ip_address = address_c['ip_address']
+                    for mip_c in absorbdict.mip_dict:
+                        if ip_address == mip_c['global_ip'] and dst_if == mip_c['if_name']:
+                            flag = True
+                            data = str(mip_c['private_ip'])
+                            multiple.handle_multiple_ip(
+                                policy, append_list, data)
 
 
 def handle_src_nat_ip():
@@ -83,10 +101,12 @@ def handle_src_nat_ip():
                         handle_src_nat_ip_is_dst_fw(
                             policy, append_list, dst_if)
         else:
-            handle_nat_if_and_protocol(policy, append_list)
+            handle_nat_if(policy, append_list)
             if not flag:
                 data = str("")
                 multiple.handle_multiple_ip(policy, append_list, data)
 
 
 handle_src_nat_ip()
+# print(len(src_nat_ip))
+# print(src_nat_ip)
