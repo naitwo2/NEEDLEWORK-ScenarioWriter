@@ -138,7 +138,7 @@ set policy id 98 name "vip" from "Trust" to "Untrust" "Any" "VIP(ethernet0/0)" "
 10. 4.で作成されたディレクトリに移動します。
     * `cd 4.で作成されたディレクトリ`
         * サンプルコマンド：`cd C:\test\NEEDLEWORK-ScenarioWriter`
-11. CLIにてツールを使用します。
+11. コマンドプロンプトにて以下のコマンドを実行し、シナリオCSVを出力します。
     * `python main\gencsv.py file_name disable_policy_output`   
       * file_name:ファイアウォールのコンフィグファイルを相対パスまたは絶対パスで入力、またはドラッグ&ドロップします。
       * disable_policy_output:コンフィグファイルで有効化していないポリシーをcsvに出力するかを決定します。
