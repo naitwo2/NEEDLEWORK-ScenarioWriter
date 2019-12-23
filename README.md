@@ -67,6 +67,7 @@ set policy id 98 name "vip" from "Trust" to "Untrust" "Any" "VIP(ethernet0/0)" "
 * 設定したserviceをポリシーで使用した場合、宛先ポートは終了ポートのみをcsvに出力します。
 * デフォルトで登録されている下記サービスの宛先ポートは以下の通りです。
   * PING(icmp)
+  * ICMP-ANY(icmp)
   * FTP（udp 21)
   * SMTP(tcp 25)
   * MAIL(tcp 25)

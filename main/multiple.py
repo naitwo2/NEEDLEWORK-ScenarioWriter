@@ -7,6 +7,7 @@ from main import absorbdict
 service_element_num = src_address_element_num = dst_address_element_num = 1
 
 pre_services = {'"PING"': {"icmp": ''},
+                '"ICMP-ANY"': {"icmp": ''},
                 '"FTP"': {"tcp": '21', "udp": '21'},
                 '"SMTP"': {"tcp": '25'},
                 '"MAIL"': {"tcp": '25'},

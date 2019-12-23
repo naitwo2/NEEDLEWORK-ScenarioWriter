@@ -11,6 +11,7 @@ src_element_num = dst_element_num = 1
 
 
 pre_services = {'"PING"': {"icmp": ''},
+                '"ICMP-ANY"': {"icmp": ''},
                 '"FTP"': {"tcp": '21', "udp": '21'},
                 '"SMTP"': {"tcp": '25'},
                 '"MAIL"': {"tcp": '25'},
@@ -116,19 +117,6 @@ def handle_other_port(policy, append_list, used_protocol):
     multiple.confirm_service_name(service_name)
     # service_list内のserviceのappend処理を行う
     handle_multiple_service_port(policy, append_list, used_protocol)
-
-
-# def no_used_protocol(policy, append_list, used_protocol):
-#    data = str("NaN")
-#    no_output_protocol(policy, used_protocol)
-#    multiple.handle_multiple_ip(
-#        policy, append_list, data)
-
-
-# def no_output_protocol(policy, used_protocol):
-#    print('%sで%sが使用されていないため出力しませんでした' % (policy['protocol'], used_protocol))
-#    print('policy_id = %sの出力をスキップしました' %
-#          policy['policy_id'])
 
 
 def handle_basic_dst_port(append_list, used_protocol):
