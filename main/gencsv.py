@@ -1,4 +1,4 @@
-import absorbdict
+from absorbdict import start
 import protocol
 import srcfw
 import srcip
@@ -105,7 +105,7 @@ def generate_csv():
         csv_title, index=False, mode='a', header=False)
     print('udpのポリシーが生成されました')
     print('csvが生成されました')
-    elapsed_time = time.time() - absorbdict.start
+    elapsed_time = time.time() - start
     print("ツールを使用した時間は{0}".format(elapsed_time) + "秒です")
 
 

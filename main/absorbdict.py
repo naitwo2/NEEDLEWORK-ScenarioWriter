@@ -2,9 +2,10 @@ import sys
 import time
 
 # TODO:マルチセルポリシーに対応する
-file_name = sys.argv[1]
-disable_policy_output = sys.argv[2]
+#file_name = sys.argv[1]
+#disable_policy_output = sys.argv[2]
 
+option = sys.argv
 start = time.time()
 
 value_name_key = ['set', 'policy', 'id', 'policy_id', 'name', 'value_name', 'from', 'src_zone', 'to',
@@ -217,7 +218,29 @@ def handle_disable_policy_output():
         absorb_config()
         exclude_disable_policy()
     else:
-        print('Error! Input again.')
+        print('第２引数を入力する場合はyかnを入力してください')
+        exit()
 
 
-handle_disable_policy_output()
+def confirm_file():
+    global file_name
+    try:
+        file_name = option[1]
+    except IndexError:
+        print('コンフィグファイル名を入力してください')
+        exit()
+
+
+def confirm_disable_policy_output():
+    global disable_policy_output
+    if len(option) == 2:
+        print('出力オプションが入力されていないのでデフォルトの出力しない処理をします')
+        disable_policy_output = 'n'
+    else:
+        disable_policy_output = option[2]
+        print('有効化していないポリシーの出力の有無 : %s' % disable_policy_output)
+    handle_disable_policy_output()
+
+
+confirm_file()
+confirm_disable_policy_output()
