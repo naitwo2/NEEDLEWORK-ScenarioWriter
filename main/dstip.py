@@ -14,10 +14,10 @@ def select_dst_ip_from_scope_ip(policy, scope_ip):
     service_name = policy['protocol']
     multiple.confirm_service_element(service_name)
     service_element_num = multiple.service_element_num
-    if policy['src_ip'] == '"Any"' and policy['src_zone'] != '"Untrust"':
+    if policy['src_ip'] == '"Any"' and '"Untrust"' not in policy['src_zone']:
         dst_ip += [str(scope_ip[1]), str(scope_ip[-2]),
                    str(scope_ip[1]), str(scope_ip[-2])] * service_element_num
-    elif "VIP" in policy['src_ip'] and policy['protocol'] == '"ANY"':
+    elif "VIP(" in policy['src_ip'] and policy['protocol'] == '"ANY"':
         for vip_c in absorbdict.vip_dict:
             if policy['src_ip'].strip(')"').split('(')[1] == vip_c['if_name'] and vip_c['global_ip'] == "interface-ip":
                 dst_ip += [str(scope_ip[1]), str(scope_ip[-2])
@@ -119,7 +119,7 @@ def add_dst_ip_list_to_subnet_mask(dst_ip_list):
                     address_c['ip_address'] + '/' + address_c['subnet_mask'])
                 exclude_ip_range_list += [exclude_ip_range]
                 break
-            elif "MIP" in dst_ip_list_c:
+            elif "MIP(" in dst_ip_list_c:
                 for mip_c in absorbdict.mip_dict:
                     if dst_ip_list_c.strip(')"').split('(')[1] == mip_c['private_ip']:
                         exclude_ip_range = ipaddress.ip_network(
@@ -186,9 +186,9 @@ def handle_implicit_any_ip(policy):
 
 def src_ip_element(policy, data, service_element_num):
     global dst_ip
-    if policy['src_ip'] == '"Any"' and policy['src_zone'] != '"Untrust"':
+    if policy['src_ip'] == '"Any"' and '"Untrust"' not in policy['src_zone']:
         dst_ip += [data] * service_element_num * 2
-    elif "VIP" in policy['src_ip']:
+    elif "VIP(" in policy['src_ip']:
         for vip_c in absorbdict.vip_dict:
             if policy['src_ip'].strip(')"').split('(')[1] == vip_c['if_name'] and vip_c['global_ip'] == "interface-ip":
                 dst_ip += [data] * service_element_num
@@ -323,7 +323,7 @@ def handle_dst_ip(policy, service_element_num):
     if policy.get('dst_nat_ip') is not None:
         data = str(policy['dst_nat_ip'])
         src_ip_element(policy, data, service_element_num)
-    elif policy['dst_ip'] == '"Any"' and policy['dst_zone'] == '"Untrust"':
+    elif policy['dst_ip'] == '"Any"' and '"Untrust"' in policy['dst_zone']:
         data = str("8.8.8.8")
         src_ip_element(policy, data, service_element_num)
     elif policy['src_ip'] == '"Any"' and policy['dst_ip'] == '"Any"' and policy['protocol'] == '"ANY"':
@@ -331,9 +331,9 @@ def handle_dst_ip(policy, service_element_num):
     elif policy['dst_ip'] == '"Any"':
         dst_zone = policy['dst_zone']
         handle_dst_ip_is_any(policy, dst_zone)
-    elif "MIP" in policy['dst_ip']:
+    elif "MIP(" in policy['dst_ip']:
         handle_mip_ip(policy, service_element_num)
-    elif "VIP" in policy['dst_ip']:
+    elif "VIP(" in policy['dst_ip']:
         handle_dst_ip_is_vip(policy, service_element_num)
     else:
         judge_dst_ip_is_group_address(policy, service_element_num)
@@ -348,3 +348,4 @@ def handle_multiple_element():
 
 
 handle_multiple_element()
+print('dstip : %s' % (len(dst_ip)))

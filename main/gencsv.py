@@ -109,6 +109,4 @@ def generate_csv():
     #print("ツールを使用した時間は{0}".format(elapsed_time) + "秒です")
 
 
-#absorbdict.confirm_file()
-#absorbdict.confirm_disable_policy_output()
 generate_csv()
