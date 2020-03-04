@@ -13,6 +13,7 @@ src_element_num = dst_element_num = 1
 pre_services = {'"PING"': {"icmp": ''},
                 '"ICMP-ANY"': {"icmp": ''},
                 '"FTP"': {"tcp": '21', "udp": '21'},
+                '"SSH"': {"tcp": '22'},
                 '"SMTP"': {"tcp": '25'},
                 '"MAIL"': {"tcp": '25'},
                 '"DNS"': {"tcp": '53', "udp": '53'},
@@ -71,6 +72,7 @@ def handle_setting_service_name(used_protocol, service_list_c):
             continue
     else:
         if not flag:
+            # TODO:udpの"SSH"は対応していないサービスですとなっているので調査する
             print('%sの%sは対応していないサービスです' % (used_protocol, service_list_c))
             print('出力をスキップしました')
             data_list += [str("NaN")]
@@ -155,3 +157,7 @@ def handle_dst_port_udp():
 handle_dst_port_icmp()
 handle_dst_port_tcp()
 handle_dst_port_udp()
+
+print('dst_port_icmp : %s' % (len(dst_port_icmp)))
+print('dst_port_tcp : %s' % (len(dst_port_tcp)))
+print('dst_port_udp : %s' % (len(dst_port_udp)))

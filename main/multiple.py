@@ -9,6 +9,7 @@ service_element_num = src_address_element_num = dst_address_element_num = 1
 pre_services = {'"PING"': {"icmp": ''},
                 '"ICMP-ANY"': {"icmp": ''},
                 '"FTP"': {"tcp": '21', "udp": '21'},
+                '"SSH"': {"tcp": '22'},
                 '"SMTP"': {"tcp": '25'},
                 '"MAIL"': {"tcp": '25'},
                 '"DNS"': {"tcp": '53', "udp": '53'},
@@ -68,11 +69,13 @@ def count_service_element_num(service_name):
         flag = False
         for pre_service_name, port_num in pre_services.items():
             if service_list_c == pre_service_name:
+                #print(pre_service_name, service_element_num)
                 flag = True
                 count_pre_service_element(pre_service_name)
                 service_element_num += pre_service_element_num
         else:
             if not flag:
+                #print(service_list_c)
                 handle_setting_service_name(service_list_c)
     return service_element_num
 
@@ -188,6 +191,8 @@ def handle_multiple_ip(policy, append_list, data):
     confirm_dst_address_element(policy, dst_address)
     service_name = policy['protocol']
     confirm_service_element(service_name)
+    #if service_name == '"PING"' or service_name == '"ICMP-ANY"':
+    #    print(service_element_num)
     append_data_to_list(append_list, data, src_element_num,
                         dst_element_num, service_element_num)
 
@@ -214,7 +219,9 @@ def confirm_src_vip_element(policy):
 
 def confirm_src_address_element(policy, src_address):
     global src_element_num
-    if policy['src_ip'] == '"Any"' and policy['src_zone'] != '"Untrust"':
+    # TODO:あとで治す
+    if policy['src_ip'] == '"Any"' and '"Untrust"' not in policy['src_zone']:
+    #if policy['src_ip'] == '"Any"' and '"Untrust"' == policy['src_zone']:
         src_element_num = 2
     elif "VIP" in policy['src_ip'] and policy['protocol'] == '"ANY"':
         confirm_src_vip_element(policy)
@@ -250,7 +257,9 @@ def confirm_dst_vip_element(policy):
 
 def confirm_dst_address_element(policy, dst_address):
     global dst_element_num
-    if policy['dst_ip'] == '"Any"' and policy['dst_zone'] != '"Untrust"':
+    # TODO:あとで治す
+    if policy['dst_ip'] == '"Any"' and '"Untrust"' not in policy['dst_zone']:
+    #if policy['dst_ip'] == '"Any"' and '"Untrust"' == policy['dst_zone']:
         dst_element_num = 2
     elif "VIP" in policy['dst_ip'] and policy['protocol'] == '"ANY"':
         confirm_dst_vip_element(policy)

@@ -16,21 +16,13 @@ def handle_protocol_icmp():
     for policy in absorbdict.policy_dict:
         if policy['protocol'] == '"ANY"':
             data = str("icmp")
-            multiple.handle_multiple_ip(policy, append_list, data)
+            multiple.handle_multiple_ip(policy, append_list, data) #715
         elif policy['protocol'] == '"PING"' or policy['protocol'] == '"ICMP-ANY"':
             data = str("icmp")
-            multiple.handle_multiple_ip(policy, append_list, data)
+            multiple.handle_multiple_ip(policy, append_list, data)#6
         else:
-            flag = False
-            for service_c in absorbdict.service_dict:
-                if policy['protocol'] == service_c['service_name'] and service_c['protocol_name'] == "icmp":
-                    flag = True
-                    data = str("icmp")
-                    multiple.handle_multiple_ip(policy, append_list, data)
-            else:
-                if not flag:
-                    data = str("")
-                    multiple.handle_multiple_ip(policy, append_list, data)
+            data = str("icmp")
+            multiple.handle_multiple_ip(policy, append_list, data)#2633
 
 
 handle_protocol_icmp()
@@ -42,21 +34,13 @@ def handle_protocol_tcp():
     for policy in absorbdict.policy_dict:
         if policy['protocol'] == '"ANY"':
             data = str("tcp")
-            multiple.handle_multiple_ip(policy, append_list, data)
+            multiple.handle_multiple_ip(policy, append_list, data)#1215
         elif policy['protocol'] == '"PING"' or policy['protocol'] == '"ICMP-ANY"':
             data = str("")
-            multiple.handle_multiple_ip(policy, append_list, data)
+            multiple.handle_multiple_ip(policy, append_list, data)#6
         else:
-            flag = False
-            for service_c in absorbdict.service_dict:
-                if policy['protocol'] == service_c['service_name'] and service_c['protocol_name'] == "tcp":
-                    flag = True
-                    data = str("tcp")
-                    multiple.handle_multiple_ip(policy, append_list, data)
-            else:
-                if not flag:
-                    data = str("tcp")
-                    multiple.handle_multiple_ip(policy, append_list, data)
+            data = str("tcp")
+            multiple.handle_multiple_ip(policy, append_list, data)#2333
 
 
 handle_protocol_tcp()
@@ -68,21 +52,17 @@ def handle_protocol_udp():
     for policy in absorbdict.policy_dict:
         if policy['protocol'] == '"ANY"':
             data = str("udp")
-            multiple.handle_multiple_ip(policy, append_list, data)
+            multiple.handle_multiple_ip(policy, append_list, data)#715
         elif policy['protocol'] == '"PING"' or policy['protocol'] == '"ICMP-ANY"':
             data = str("")
-            multiple.handle_multiple_ip(policy, append_list, data)
+            multiple.handle_multiple_ip(policy, append_list, data)#6
         else:
-            flag = False
-            for service_c in absorbdict.service_dict:
-                if policy['protocol'] == service_c['service_name'] and service_c['protocol_name'] == "udp":
-                    flag = True
-                    data = str("udp")
-                    multiple.handle_multiple_ip(policy, append_list, data)
-            else:
-                if not flag:
-                    data = str("udp")
-                    multiple.handle_multiple_ip(policy, append_list, data)
+            data = str("udp")
+            multiple.handle_multiple_ip(policy, append_list, data)#2627
 
 
 handle_protocol_udp()
+
+print('protocol_icmp : %s' % (len(protocol_icmp)))
+print('protocol_tcp : %s' % (len(protocol_tcp)))
+print('protocol_udp : %s' % (len(protocol_udp)))
