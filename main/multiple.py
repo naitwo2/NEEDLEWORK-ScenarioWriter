@@ -193,8 +193,6 @@ def handle_multiple_ip(policy, append_list, data):
     confirm_dst_address_element(policy, dst_address)
     service_name = policy['protocol']
     confirm_service_element(service_name)
-    #if service_name == '"PING"' or service_name == '"ICMP-ANY"':
-    #    print(service_element_num)
     append_data_to_list(append_list, data, src_element_num,
                         dst_element_num, service_element_num)
 
@@ -221,9 +219,8 @@ def confirm_src_vip_element(policy):
 
 def confirm_src_address_element(policy, src_address):
     global src_element_num
-    # TODO:あとで治す
-    if policy['src_ip'] == '"Any"' and '"Untrust"' not in policy['src_zone']:
-    #if policy['src_ip'] == '"Any"' and '"Untrust"' == policy['src_zone']:
+    # TODO:IPが割り当てられていないゾーンを用いると重複して出力されているためelement_numを修正する
+    if policy['src_ip'] == '"Any"' and 'Untrust"' not in policy['src_zone']:
         src_element_num = 2
     elif "VIP(" in policy['src_ip'] and policy['protocol'] == '"ANY"':
         confirm_src_vip_element(policy)
@@ -259,8 +256,8 @@ def confirm_dst_vip_element(policy):
 
 def confirm_dst_address_element(policy, dst_address):
     global dst_element_num
-    # TODO:あとで治す
-    if policy['dst_ip'] == '"Any"' and '"Untrust"' not in policy['dst_zone']:
+    # TODO:IPが割り当てられていないゾーンを用いると重複して出力されているためelement_numを修正する
+    if policy['dst_ip'] == '"Any"' and 'Untrust"' not in policy['dst_zone']:
         dst_element_num = 2
     elif "VIP(" in policy['dst_ip'] and policy['protocol'] == '"ANY"':
         confirm_dst_vip_element(policy)

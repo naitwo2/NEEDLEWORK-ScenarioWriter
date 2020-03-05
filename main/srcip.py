@@ -14,9 +14,8 @@ def select_src_ip_from_scope_ip(policy, scope_ip):
     service_name = policy['protocol']
     multiple.confirm_service_element(service_name)
     service_element_num = multiple.service_element_num
-    if policy['dst_ip'] == '"Any"' and '"Untrust"' not in policy['dst_zone']:
-        # TODO:エラー箇所はここなためpolicy_id=2のポリシーを見て修正する
-        # TODO:scope_ip = /32の時の処理を書く, IndexError
+    # TODO:IPが割り当てられていないゾーンを用いると重複して出力されているためappendする数を一つにする
+    if policy['dst_ip'] == '"Any"' and 'Untrust"' not in policy['dst_zone']:
         try:
             src_ip += [str(scope_ip[1]), str(scope_ip[-2]),
                     str(scope_ip[-2]), str(scope_ip[1])] * service_element_num
@@ -37,7 +36,6 @@ def select_src_ip_from_scope_ip(policy, scope_ip):
                 except IndexError:
                     src_ip += [str(scope_ip[0]), str(scope_ip[0])] * service_element_num
     else:
-        #count += 1 #91
         address_name = policy['dst_ip']
         multiple.judge_dst_address_name(address_name)
         dst_address_element_num = multiple.dst_address_element_num
@@ -45,6 +43,7 @@ def select_src_ip_from_scope_ip(policy, scope_ip):
             src_ip += [str(scope_ip[1]), str(scope_ip[-2])] * service_element_num * dst_address_element_num
         except IndexError:
             src_ip += [str(scope_ip[0]), str(scope_ip[0])] * service_element_num * dst_address_element_num
+
 
 # 該当するIFで定義している中で最も広いnetworkアドレスを返す
 def src_if_network_range(src_if):
@@ -202,7 +201,7 @@ def handle_implicit_any_ip(policy):
 
 def dst_ip_element(policy, data, service_element_num):
     global src_ip
-    if policy['dst_ip'] == '"Any"' and '"Untrust"' not in policy['dst_zone']:
+    if policy['dst_ip'] == '"Any"' and 'Untrust"' not in policy['dst_zone']:
         src_ip += [data] * service_element_num * 2
     elif "VIP(" in policy['dst_ip']:
         for vip_c in absorbdict.vip_dict:
@@ -267,7 +266,6 @@ def handle_src_ip_is_any(policy, src_zone):
                         define_scope_ip(policy, network_address_list)
                         break
                 else:
-                    #count += 1
                     exclude_fw_ip_from_scope_ip(scope_ip)
                     define_scope_ip(policy, network_address_list)
                 # TODO:route,if_ipの両方にIFが使われていない場合の処理を下のelseも考慮しながら入れる
@@ -286,33 +284,24 @@ def confirm_src_if(policy, src_zone):
     return src_if
 
 
-# TODO:この辺からdstipと異なる
-
-
 def judge_src_ip_is_group_address(policy, service_element_num):
-    global count
     if len(absorbdict.group_address_dict) >= 2:
-        #count += 1 #471
         flag = False
         for group_address_c in absorbdict.group_address_dict:
             if policy['src_ip'] == group_address_c['group_name']:
                 flag = True
-                #count += 1 #1074 not OK?
                 src_address_name = group_address_c['address_name']
                 flags = False
                 for address_c in absorbdict.address_dict:
                     if src_address_name == address_c['address_name']:
                         flags = True
-                        #count += 1 #1049
                         data = str(address_c['ip_address'])
                         dst_ip_element(policy, data, service_element_num)
                 else:
                     if not flags:
-                        #count += 1 #25
                         print(src_address_name)
         else:
             if not flag:
-                #count += 1#395
                 address_src_ip(policy, service_element_num)#665
     else:
         address_src_ip(policy, service_element_num)
@@ -342,23 +331,17 @@ def handle_mip_ip(policy, service_element_num):
             break
 
 
-count = 0
-
-
 def handle_src_ip(policy, service_element_num):
     global src_ip
-    global count
     if policy.get('src_nat_ip') is not None:
         data = str(policy['src_nat_ip'])
         dst_ip_element(policy, data, service_element_num)
-    elif policy['src_ip'] == '"Any"' and '"Untrust"' in policy['src_zone']:
-        #count += 1 #0
+    elif policy['src_ip'] == '"Any"' and 'Untrust"' in policy['src_zone']:
         data = str("8.8.8.8")
         dst_ip_element(policy, data, service_element_num)
     elif policy['src_ip'] == policy['dst_ip'] == '"Any"' and policy['protocol'] == '"ANY"':
         handle_implicit_any_ip(policy)
     elif policy['src_ip'] == '"Any"':
-        #count += 1 #91
         src_zone = policy['src_zone']
         handle_src_ip_is_any(policy, src_zone)
     elif "MIP(" in policy['src_ip']:
@@ -366,7 +349,6 @@ def handle_src_ip(policy, service_element_num):
     elif "VIP(" in policy['src_ip']:
         handle_src_ip_is_vip(policy, service_element_num)
     else:
-        #count += 1 #471
         judge_src_ip_is_group_address(policy, service_element_num)
 
 
