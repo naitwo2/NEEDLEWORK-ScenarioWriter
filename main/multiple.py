@@ -4,7 +4,9 @@ from main import absorbdict
 # 送信元または宛先IPがVIPかつプロトコルがANYの場合そのポリシーはリストに（該当するVIP）個追加する
 # TODO:group_addressのaddress_nameにgroup_addressは別途対応する
 
-service_element_num = src_address_element_num = dst_address_element_num = 1
+service_element_num = 1
+src_address_element_num = 1
+dst_address_element_num = 1
 
 pre_services = {'"PING"': {"icmp": ''},
                 '"ICMP-ANY"': {"icmp": ''},
@@ -223,7 +225,7 @@ def confirm_src_address_element(policy, src_address):
     if policy['src_ip'] == '"Any"' and '"Untrust"' not in policy['src_zone']:
     #if policy['src_ip'] == '"Any"' and '"Untrust"' == policy['src_zone']:
         src_element_num = 2
-    elif "VIP" in policy['src_ip'] and policy['protocol'] == '"ANY"':
+    elif "VIP(" in policy['src_ip'] and policy['protocol'] == '"ANY"':
         confirm_src_vip_element(policy)
     else:
         if len(absorbdict.group_address_dict) >= 2:
@@ -259,9 +261,8 @@ def confirm_dst_address_element(policy, dst_address):
     global dst_element_num
     # TODO:あとで治す
     if policy['dst_ip'] == '"Any"' and '"Untrust"' not in policy['dst_zone']:
-    #if policy['dst_ip'] == '"Any"' and '"Untrust"' == policy['dst_zone']:
         dst_element_num = 2
-    elif "VIP" in policy['dst_ip'] and policy['protocol'] == '"ANY"':
+    elif "VIP(" in policy['dst_ip'] and policy['protocol'] == '"ANY"':
         confirm_dst_vip_element(policy)
     else:
         if len(absorbdict.group_address_dict) >= 2:

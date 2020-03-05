@@ -129,14 +129,13 @@ def create_ifinfo():
             if not flag:
                 d = {'IF_Name': if_zone_c['if_name'], 'Zone': if_zone_c['zone_name'], 'IP': 'None'}
                 ifinfo.append(d)
-    print(ifinfo)
 
 
 def absorb_config():
     with open(file_name) as f:
         for line in f:
             value = line.strip().split()
-            if "manage" in line or "bypass" in line or "proxy-arp-entry" in line or "mtu" in line or "unset" in line or "sharable" in line:
+            if "manageable" in line or "manage-ip" in line or "bypass" in line or "proxy-arp-entry" in line or "mtu" in line or "unset" in line or "sharable" in line:
                 continue
             if "set policy id" in line and "name" in line and "from" in line:
                 dictionary = policy_dict
@@ -163,7 +162,7 @@ def absorb_config():
                 route = value
                 d = {k: v for k, v in zip(route_key, route)}
                 route_dict.append(d)
-            elif "set group address" in line:
+            elif "set group address" in line and "comment" not in line:
                 group_address = value
                 if len(group_address) == 7:
                     d = {k: v for k, v in zip(
