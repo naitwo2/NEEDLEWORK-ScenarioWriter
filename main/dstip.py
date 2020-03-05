@@ -5,6 +5,8 @@ from main import multiple
 
 dst_ip = []
 
+count = 0
+
 # dst-ipのリストの生成
 
 
@@ -15,22 +17,34 @@ def select_dst_ip_from_scope_ip(policy, scope_ip):
     multiple.confirm_service_element(service_name)
     service_element_num = multiple.service_element_num
     if policy['src_ip'] == '"Any"' and '"Untrust"' not in policy['src_zone']:
-        dst_ip += [str(scope_ip[1]), str(scope_ip[-2]),
+        try:
+            dst_ip += [str(scope_ip[1]), str(scope_ip[-2]),
                    str(scope_ip[1]), str(scope_ip[-2])] * service_element_num
+        except IndexError:
+            dst_ip += [str(scope_ip[0]), str(scope_ip[0]), str(scope_ip[0]), str(scope_ip[0])] * service_element_num
     elif "VIP(" in policy['src_ip'] and policy['protocol'] == '"ANY"':
         for vip_c in absorbdict.vip_dict:
             if policy['src_ip'].strip(')"').split('(')[1] == vip_c['if_name'] and vip_c['global_ip'] == "interface-ip":
-                dst_ip += [str(scope_ip[1]), str(scope_ip[-2])
+                try:
+                    dst_ip += [str(scope_ip[1]), str(scope_ip[-2])
                            ] * service_element_num
+                except IndexError:
+                    dst_ip += [str(scope_ip[0]), str(scope_ip[0]), str(scope_ip[0]), str(scope_ip[0])] * service_element_num
             elif policy['src_ip'].strip(')"').split('(')[1] == vip_c['global_ip']:
-                dst_ip += [str(scope_ip[1]), str(scope_ip[-2])
+                try:
+                    dst_ip += [str(scope_ip[1]), str(scope_ip[-2])
                            ] * service_element_num
+                except IndexError:
+                    dst_ip += [str(scope_ip[0]), str(scope_ip[0]), str(scope_ip[0]), str(scope_ip[0])] * service_element_num
     else:
         address_name = policy['src_ip']
         multiple.judge_src_address_name(address_name)
         src_address_element_num = multiple.src_address_element_num
-        dst_ip += [str(scope_ip[1]), str(scope_ip[-2])] * \
-            service_element_num * src_address_element_num
+        try:
+            dst_ip += [str(scope_ip[1]), str(scope_ip[-2])
+                    ] * service_element_num * src_address_element_num
+        except IndexError:
+            dst_ip += [str(scope_ip[0]), str(scope_ip[0]), str(scope_ip[0]), str(scope_ip[0])] * service_element_num * src_address_element_num
 
 
 # 該当するIFで定義している中で最も広いnetworkアドレスを返す
@@ -249,7 +263,8 @@ def handle_dst_ip_is_any(policy, dst_zone):
                         define_scope_ip(policy, network_address_list)
                         break
                 else:
-                    continue
+                    exclude_fw_ip_from_scope_ip(scope_ip)
+                    define_scope_ip(policy, network_address_list)
         else:
             exclude_fw_ip_from_scope_ip(scope_ip)
             define_scope_ip(policy, network_address_list)
@@ -261,6 +276,9 @@ def confirm_dst_if(policy, dst_zone):
         if dst_zone == if_zone['zone_name']:
             dst_if = if_zone['if_name']
     return dst_if
+
+
+# TODO:この辺からsrcipと異なる
 
 
 def handle_dst_ip_list(policy, dst_ip_list):
@@ -277,18 +295,23 @@ def handle_dst_ip_list(policy, dst_ip_list):
 
 def judge_dst_ip_is_group_address(policy, service_element_num):
     if len(absorbdict.group_address_dict) >= 2:
-        dst_ip_list = []
+        flag = False
         for group_address_c in absorbdict.group_address_dict:
             if policy['dst_ip'] == group_address_c['group_name']:
+                flag = True
                 dst_address_name = group_address_c['address_name']
+                flags = False
                 for address_c in absorbdict.address_dict:
                     if dst_address_name == address_c['address_name']:
-                        dst_ip_list += [str(address_c['ip_address'])]
-                        continue
+                        flags = True
+                        data = str(address_c['ip_address'])
+                        src_ip_element(policy, data, service_element_num)
+                else:
+                    if not flags:
+                        #count += 1 #25
+                        print(dst_address_name)
         else:
-            if dst_ip_list != []:
-                handle_dst_ip_list(policy, dst_ip_list)
-            else:
+            if not flag:
                 address_dst_ip(policy, service_element_num)
     else:
         address_dst_ip(policy, service_element_num)
@@ -320,6 +343,7 @@ def handle_mip_ip(policy, service_element_num):
 
 def handle_dst_ip(policy, service_element_num):
     global dst_ip
+    global count
     if policy.get('dst_nat_ip') is not None:
         data = str(policy['dst_nat_ip'])
         src_ip_element(policy, data, service_element_num)
@@ -330,12 +354,14 @@ def handle_dst_ip(policy, service_element_num):
         handle_implicit_any_ip(policy)
     elif policy['dst_ip'] == '"Any"':
         dst_zone = policy['dst_zone']
+        #count += 1#30
         handle_dst_ip_is_any(policy, dst_zone)
     elif "MIP(" in policy['dst_ip']:
         handle_mip_ip(policy, service_element_num)
     elif "VIP(" in policy['dst_ip']:
         handle_dst_ip_is_vip(policy, service_element_num)
     else:
+        #count += 1#532
         judge_dst_ip_is_group_address(policy, service_element_num)
 
 
@@ -349,3 +375,4 @@ def handle_multiple_element():
 
 handle_multiple_element()
 print('dstip : %s' % (len(dst_ip)))
+print(count)
