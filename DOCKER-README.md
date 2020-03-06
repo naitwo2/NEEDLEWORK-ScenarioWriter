@@ -31,7 +31,6 @@ tcpのポリシーが生成されました
 udpのポリシーを生成しています
 udpのポリシーが生成されました
 csvが生成されました
-ツールを使用した時間は0.43530774116516113秒です
 =======CSVを出力します=======
 exclude-list,,protocol,src-fw,src-vlan(option),src-ip,src-port(option),src-nat-ip(option),dst-fw,dst-vlan(option),dst-nat-ip(option),dst-nat-port (option),dst-ip,dst-port,url/domain(option),anti-virus(option),timeout(option),try(option),expect,description
 ,,icmp,172.16.0.254,,192.168.128.1,,,10.0.0.254,,172.16.0.254,,200.200.200.203,,,,,,drop,policy id =77
