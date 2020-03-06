@@ -61,4 +61,4 @@ def handle_src_fw():
 
 handle_src_fw()
 
-print('srcfw : %s' % (len(src_fw)))
+# print('srcfw : %s' % (len(src_fw)))

@@ -27,4 +27,4 @@ def handle_dst_nat_ip():
 
 
 handle_dst_nat_ip()
-print('dstnatip : %s' % (len(dst_nat_ip)))
+# print('dstnatip : %s' % (len(dst_nat_ip)))

@@ -21,4 +21,4 @@ def handle_dst_vlan():
 
 
 handle_dst_vlan()
-print('dstvlan : %s' % (len(dst_vlan)))
+# print('dstvlan : %s' % (len(dst_vlan)))
