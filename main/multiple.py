@@ -12,19 +12,37 @@ pre_services = {'"PING"': {"icmp": ''},
                 '"ICMP-ANY"': {"icmp": ''},
                 '"FTP"': {"tcp": '21', "udp": '21'},
                 '"SSH"': {"tcp": '22'},
+                '"TELNET"': {"tcp": '23'},
                 '"SMTP"': {"tcp": '25'},
                 '"MAIL"': {"tcp": '25'},
                 '"DNS"': {"tcp": '53', "udp": '53'},
+                '"TFTP"': {"tcp": '69'},
                 '"HTTP"': {"tcp": '80'},
                 '"POP3"': {"tcp": '110'},
                 '"NTP"': {"tcp": '123', "udp": '123'},
+                '"MS-RPC-EPM"': {"tcp": '135', "udp": '135'},
+                '"NBNAME"': {"udp": '137'},
                 '"NBDS"': {"udp": '138'},
+                '"SMB"': {"tcp": '139'},
                 '"IMAP"': {"tcp": '143'},
                 '"SNMP"': {"tcp": '161', "udp": '161'},
                 '"LDAP"': {"tcp": '389'},
                 '"HTTPS"': {"tcp": '443'},
+                '"IKE"': {"udp": '500'},
                 '"SYSLOG"': {"udp": '514'},
-                '"WINFRAME"': {"tcp": '1494'}}
+                '"TALK"': {"udp": '517'},
+                '"MS-SQL"': {"tcp": '1433'},
+                '"WINFRAME"': {"tcp": '1494'},
+                '"L2TP"': {"udp": '1701'},
+                '"H.323"': {"tcp": '1720'},
+                '"PPTP"': {"tcp": '1723'},
+                '"RADIUS"': {"udp": '1812'},
+                '"SIP"': {"tcp": '5060', "udp": '5060'},
+                '"X-WINDOWS"': {"tcp": '6000'},
+                '"HTTP-EXT"': {"tcp": '8000'},
+                '"TRACEROUTE"': {"icmp": '', "udp": '33400'},
+                '"TCP-ANY"': {"tcp": '65535'},
+                '"UDP-ANY"': {"udp": '65535'}}
 
 
 def confirm_service_name(service_name):
@@ -219,13 +237,12 @@ def confirm_src_vip_element(policy):
 
 def confirm_src_address_element(policy, src_address):
     global src_element_num
-    # TODO:IPが割り当てられていないゾーンを用いると重複して出力されているためelement_numを修正する
     if policy['src_ip'] == '"Any"' and 'Untrust"' not in policy['src_zone']:
         src_element_num = 2
     elif "VIP(" in policy['src_ip'] and policy['protocol'] == '"ANY"':
         confirm_src_vip_element(policy)
     else:
-        if len(absorbdict.group_address_dict) >= 2:
+        if absorbdict.group_address_dict != []:
             address_name = src_address
             judge_src_address_name(address_name)
             src_element_num = src_address_element_num
@@ -262,7 +279,7 @@ def confirm_dst_address_element(policy, dst_address):
     elif "VIP(" in policy['dst_ip'] and policy['protocol'] == '"ANY"':
         confirm_dst_vip_element(policy)
     else:
-        if len(absorbdict.group_address_dict) >= 2:
+        if absorbdict.group_address_dict != []:
             address_name = dst_address
             judge_dst_address_name(address_name)
             dst_element_num = dst_address_element_num

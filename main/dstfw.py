@@ -70,4 +70,4 @@ def handle_dst_fw():
 
 
 handle_dst_fw()
-print('dstfw : %s' % (len(dst_fw)))
+# print('dstfw : %s' % (len(dst_fw)))
