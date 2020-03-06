@@ -1,11 +1,10 @@
 import sys
-import time
 
 # TODO:マルチセルポリシーに対応する
-file_name = sys.argv[1]
-disable_policy_output = sys.argv[2]
 
-start = time.time()
+option = sys.argv
+
+ifinfo = []
 
 value_name_key = ['set', 'policy', 'id', 'policy_id', 'name', 'value_name', 'from', 'src_zone', 'to',
                   'dst_zone', 'src_ip', 'dst_ip', 'protocol', 'nat', 'src', 'dst', 'ip', 'dst_nat_ip', 'expect', 'log']
@@ -117,11 +116,26 @@ def append_if_zone_to_zone_dict(value):
         if_zone_dict.append(d)
 
 
+def create_ifinfo():
+    global ifinfo
+    for if_zone_c in if_zone_dict:
+        flag = False
+        for if_ip_c in if_ip_dict:
+            if if_zone_c['if_name'].replace('"', '') in if_ip_c['if_name']:
+                flag = True
+                d = {'IF_Name': if_zone_c['if_name'].replace('"', ''), 'Zone': if_zone_c['zone_name'], 'IP': if_ip_c.get('ip_address')}
+                ifinfo.append(d)
+        else:
+            if not flag:
+                d = {'IF_Name': if_zone_c['if_name'], 'Zone': if_zone_c['zone_name'], 'IP': 'None'}
+                ifinfo.append(d)
+
+
 def absorb_config():
     with open(file_name) as f:
         for line in f:
             value = line.strip().split()
-            if "manage" in line or "bypass" in line or "proxy-arp-entry" in line or "mtu" in line or "unset" in line or "sharable" in line:
+            if "manageable" in line or "manage-ip" in line or "bypass" in line or "proxy-arp-entry" in line or "mtu" in line or "unset" in line or "sharable" in line:
                 continue
             if "set policy id" in line and "name" in line and "from" in line:
                 dictionary = policy_dict
@@ -148,7 +162,7 @@ def absorb_config():
                 route = value
                 d = {k: v for k, v in zip(route_key, route)}
                 route_dict.append(d)
-            elif "set group address" in line:
+            elif "set group address" in line and "comment" not in line:
                 group_address = value
                 if len(group_address) == 7:
                     d = {k: v for k, v in zip(
@@ -212,12 +226,36 @@ def exclude_disable_policy():
 
 def handle_disable_policy_output():
     if disable_policy_output == 'y':
+        print('有効化していないポリシーも出力します')
         absorb_config()
     elif disable_policy_output == 'n':
+        print('有効化していないポリシーは出力しません')
         absorb_config()
         exclude_disable_policy()
     else:
-        print('Error! Input again.')
+        print('第２引数を入力する場合はyかnを入力してください')
+        exit()
 
 
-handle_disable_policy_output()
+def confirm_file():
+    global file_name
+    try:
+        file_name = option[1]
+    except IndexError:
+        print('コンフィグファイル名を入力してください')
+        exit()
+    
+
+def confirm_disable_policy_output():
+    global disable_policy_output
+    if len(option) == 2:
+        print('有効化していないポリシーの出力オプションが入力されていません')
+        disable_policy_output = 'n'
+    else:
+        disable_policy_output = option[2]
+    handle_disable_policy_output()
+
+
+confirm_file()
+confirm_disable_policy_output()
+create_ifinfo()

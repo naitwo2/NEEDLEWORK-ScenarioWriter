@@ -8,21 +8,25 @@ src_fw = []
 # src-fwのリストの生成
 
 
+# [x['Value'] for x in list if x['Key'] == 'Name']
+# TODO:一つのゾーンが複数のIFに割り当てられていてかつIPがIF数分振られていない時の処理を考える
 def decide_src_fw(policy, append_list, src_if):
-    for if_ip_c in absorbdict.if_ip_dict:
-        if src_if.replace('"', '') == if_ip_c['if_name'].replace('"', ''):
-            data = str(
-                if_ip_c['ip_address'].split('/')[0])
-            multiple.handle_multiple_ip(
-                policy, append_list, data)
-
+    for i in absorbdict.ifinfo:
+        if src_if in i['IF_Name']:
+            data = str(i['IP'].split('/')[0])
+            if data != 'None':
+                multiple.handle_multiple_ip(
+                    policy, append_list, data)
+    
 
 def handle_src_fw():
     global src_fw
     append_list = src_fw
     for policy in absorbdict.policy_dict:
-        for if_zone in absorbdict.if_zone_dict:
-            if "VIP" in policy['src_ip']:
+        flag = False
+        for i in absorbdict.ifinfo:
+            if "VIP(" in policy['src_ip']:
+                flag = True
                 for vip_c in absorbdict.vip_dict:
                     if policy['src_ip'].strip(')"').split('(')[1] == vip_c['global_ip']:
                         longest_match = {}
@@ -34,17 +38,27 @@ def handle_src_fw():
                             else:
                                 continue
                         max_keys = max(longest_match, key=longest_match.get)
-                        src_if = max_keys
+                        src_if = max_keys.replace('"', '')
                         decide_src_fw(policy, append_list, src_if)
                         break
                     elif policy['src_ip'].strip(')"').split('(')[1] == vip_c['if_name'] and vip_c['global_ip'] == "interface-ip":
-                        src_if = policy['src_ip'].strip(')"').split('(')[1]
+                        src_if = policy['src_ip'].strip(')"').split('(')[1].replace('"', '')
                         decide_src_fw(policy, append_list, src_if)
                         break
                 break
-            elif policy['src_zone'] == if_zone['zone_name']:
-                src_if = if_zone['if_name']
+            elif policy['src_zone'] == i['Zone'] and i['IP'] != 'None':
+                flag = True
+                src_if = i['IF_Name']
                 decide_src_fw(policy, append_list, src_if)
+        else:
+            if not flag:
+                data = str('3.3.3.3')
+                multiple.handle_multiple_ip(
+                    policy, append_list, data)
+   
+
 
 
 handle_src_fw()
+
+# print('srcfw : %s' % (len(src_fw)))

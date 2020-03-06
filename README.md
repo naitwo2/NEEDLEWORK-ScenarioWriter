@@ -69,24 +69,44 @@ set policy id 98 name "vip" from "Trust" to "Untrust" "Any" "VIP(ethernet0/0)" "
   * PING(icmp)
   * ICMP-ANY(icmp)
   * FTP（udp 21)
+  * SSH（tcp 22)
+  * TELNET(tcp 23)
   * SMTP(tcp 25)
   * MAIL(tcp 25)
   * DNS(tcp,udp 53)
+  * TFTP(tcp 69) 
   * HTTP(tcp 80)
   * POP3(tcp 110)   
   * NTP(tcp,udp 123)
+  * MS-RPC-EPM(tcp,udp 135)
+  * NBNAME(udp 137)
   * NBDS(udp 138)
+  * SMB(tcp 139)
   * IMAP(tcp 143)
   * SNMP(tcp,udp 161)
   * LDAP(tcp 389)
   * HTTPS(tcp 443)
+  * IKE(udp 500)
   * SYSLOG(udp 514)
+  * TALK(udp 517)
+  * MS-SQL(tcp 1433)
   * WINFRAME(tcp 1494)
+  * L2TP(udp 1701)
+  * H.323(tcp 1720)
+  * PPTP(tcp 1723)
+  * RADIUS(udp 1812)
+  * SIP(tcp, udp 5060)
+  * X-WINDOWS(tcp 6000)
+  * HTTP-EXT(tcp 8000)
+  * TRACEROUTE(icmp, udp 33400)
+  * TCP-ANY(tcp 65535)
+  * UDP-ANY(udp 65535)
 * ポリシーのServiceがANYの場合、csvに出力される宛先ポート番号は下記の通りです。
   * icmp:なし
   * tcp,udp:65535
 
 ## その他
+* アドレス名またはサービス名にスペースが含まれる場合、正常にcsvが出力されない恐れがありますのでご注意ください。
 * インターフェースに割り当てられていないゾーンがポリシーで使用されている場合、正常にcsvが出力されない恐れがありますのでご注意ください。
 * マルチセルポリシーは現在対応しておりません。通常のポリシーとして扱います。
 * csvに非出力のポリシーは理由がメッセージとして出力されます。
@@ -144,7 +164,8 @@ set policy id 98 name "vip" from "Trust" to "Untrust" "Any" "VIP(ethernet0/0)" "
       * disable_policy_output:コンフィグファイルで有効化していないポリシーをcsvに出力するかを決定します。
         * `y` : 出力する
         * `n` : 出力しない
-        * サンプルコマンド：`python main\gencsv.py SSGconfig.txt y`
+        * 未入力 : 出力しない
+        * サンプルコマンド ： `python main\gencsv.py SSGconfig.txt y`
 
 2回目以降使用する場合はコマンドで`git pull origin master`を入力後項番10を入力してください。
 

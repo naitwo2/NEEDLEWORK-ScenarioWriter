@@ -15,3 +15,4 @@ def handle_description():
 
 
 handle_description()
+# print('description : %s' % (len(description)))

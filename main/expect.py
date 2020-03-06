@@ -10,12 +10,12 @@ expect_icmp = []
 
 
 def judge_default_expect(policy, append_list):
-    if "permit" == policy['expect']:
+    if 'permit' == policy['expect']:
         data = str("pass")
-        multiple.handle_multiple_ip(policy, append_list, data)
+        multiple.handle_multiple_ip(policy, append_list, data)#2673
     else:
         data = str("drop")
-        multiple.handle_multiple_ip(policy, append_list, data)
+        multiple.handle_multiple_ip(policy, append_list, data)#660 + 10
 
 
 # PINGまたはICMP-ANYが前のポリシーで使用されていると想定と異なる結果となるためスキップする
@@ -30,7 +30,7 @@ def confirm_service_name_ping(policy, service_name_list):
             multiple.handle_multiple_ip(policy, append_list, data)
             break
     else:
-        # TODO:その他も見る必要があるため要修正
+        # TODO:その他も見る必要があれば修正する
         judge_default_expect(policy, append_list)
 
 
@@ -122,14 +122,13 @@ def decide_after_dst_if(policy, dst_ip):
 
 
 def handle_expect_of_changed_if(policy, append_list):
-    global expect
     global after_dst_if
     if policy.get('dst_nat_ip') is not None:
         dst_ip = policy['dst_nat_ip']
         decide_after_dst_if(policy, dst_ip)
         after_dst_zone(policy, after_dst_if, append_list)
     # vip時はprivate_ipのifがsrc_zoneとなる
-    elif "VIP" in policy['src_ip']:
+    elif "VIP(" in policy['src_ip']:
         for vip_c in absorbdict.vip_dict:
             if policy['src_ip'].strip(')"').split('(')[1] == vip_c['global_ip']:
                 src_ip = vip_c['private_ip']
@@ -142,7 +141,8 @@ def handle_expect_of_changed_if(policy, append_list):
                 after_src_zone(policy, after_src_if, append_list)
                 break
     # vip時はprivate_ipのifがdst_zoneとなる
-    elif "VIP" in policy['dst_ip']:
+    # TODO:ここに吸収されてるためその他も含めて修正する
+    elif "VIP(" in policy['dst_ip']:
         for vip_c in absorbdict.vip_dict:
             if policy['dst_ip'].strip(')"').split('(')[1] == vip_c['global_ip']:
                 dst_ip = vip_c['private_ip']
@@ -167,9 +167,6 @@ def handle_expect():
         handle_expect_of_changed_if(policy, append_list)
 
 
-handle_expect()
-
-
 # PINGがAny Any ANYのポリシー前で使用されていると想定と異なるため分けて出力する
 def handle_expect_icmp():
     global expect_icmp
@@ -181,4 +178,8 @@ def handle_expect_icmp():
             handle_expect_of_changed_if(policy, append_list)
 
 
+handle_expect()
 handle_expect_icmp()
+
+# print('expect : %s' % (len(expect)))
+# print('expect_icmp : %s' % (len(expect_icmp)))

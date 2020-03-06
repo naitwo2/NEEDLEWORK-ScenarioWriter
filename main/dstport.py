@@ -5,7 +5,8 @@ dst_port_icmp = []
 dst_port_tcp = []
 dst_port_udp = []
 
-src_element_num = dst_element_num = 1
+src_element_num = 1
+dst_element_num = 1
 
 # dst-portのリストの生成
 
@@ -13,19 +14,38 @@ src_element_num = dst_element_num = 1
 pre_services = {'"PING"': {"icmp": ''},
                 '"ICMP-ANY"': {"icmp": ''},
                 '"FTP"': {"tcp": '21', "udp": '21'},
+                '"SSH"': {"tcp": '22'},
+                '"TELNET"': {"tcp": '23'},
                 '"SMTP"': {"tcp": '25'},
                 '"MAIL"': {"tcp": '25'},
                 '"DNS"': {"tcp": '53', "udp": '53'},
+                '"TFTP"': {"tcp": '69'},
                 '"HTTP"': {"tcp": '80'},
                 '"POP3"': {"tcp": '110'},
                 '"NTP"': {"tcp": '123', "udp": '123'},
+                '"MS-RPC-EPM"': {"tcp": '135', "udp": '135'},
+                '"NBNAME"': {"udp": '137'},
                 '"NBDS"': {"udp": '138'},
+                '"SMB"': {"tcp": '139'},
                 '"IMAP"': {"tcp": '143'},
                 '"SNMP"': {"tcp": '161', "udp": '161'},
                 '"LDAP"': {"tcp": '389'},
                 '"HTTPS"': {"tcp": '443'},
+                '"IKE"': {"udp": '500'},
                 '"SYSLOG"': {"udp": '514'},
-                '"WINFRAME"': {"tcp": '1494'}}
+                '"TALK"': {"udp": '517'},
+                '"MS-SQL"': {"tcp": '1433'},
+                '"WINFRAME"': {"tcp": '1494'},
+                '"L2TP"': {"udp": '1701'},
+                '"H.323"': {"tcp": '1720'},
+                '"PPTP"': {"tcp": '1723'},
+                '"RADIUS"': {"udp": '1812'},
+                '"SIP"': {"tcp": '5060', "udp": '5060'},
+                '"X-WINDOWS"': {"tcp": '6000'},
+                '"HTTP-EXT"': {"tcp": '8000'},
+                '"TRACEROUTE"': {"icmp": '', "udp": '33400'},
+                '"TCP-ANY"': {"tcp": '65535'},
+                '"UDP-ANY"': {"udp": '65535'}}
 
 
 def handle_protocol_any(policy, append_list, used_protocol):
@@ -71,6 +91,7 @@ def handle_setting_service_name(used_protocol, service_list_c):
             continue
     else:
         if not flag:
+            # TODO:udpの"SSH"は対応していないサービスですとなっているので調査する
             print('%sの%sは対応していないサービスです' % (used_protocol, service_list_c))
             print('出力をスキップしました')
             data_list += [str("NaN")]
@@ -155,3 +176,7 @@ def handle_dst_port_udp():
 handle_dst_port_icmp()
 handle_dst_port_tcp()
 handle_dst_port_udp()
+
+# print('dst_port_icmp : %s' % (len(dst_port_icmp)))
+# print('dst_port_tcp : %s' % (len(dst_port_tcp)))
+# print('dst_port_udp : %s' % (len(dst_port_udp)))

@@ -20,3 +20,5 @@ def handle_src_vlan():
 
 
 handle_src_vlan()
+
+# print('srcvlan : %s' % (len(src_vlan)))
