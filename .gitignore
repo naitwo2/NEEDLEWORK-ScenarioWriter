@@ -1,4 +1,4 @@
 .DS_Store
 __pycache__
 *.csv
-test_sample_cfg_*.txt
+test*.txt
