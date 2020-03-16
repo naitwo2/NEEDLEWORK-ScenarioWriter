@@ -86,46 +86,64 @@ def policy_multicell(file_name, target_line_no):
     policy_element = []
     policy_value_list = []
     target_line = []
-    #target_line = ""
+    base_policy = []
     while True:
         #本関数 呼び出し元で処理していた行の値を取得
-        target_line = linecache.getline(file_name, target_line_no)
+        config_file = open(file_name, 'r')
+        target_line = config_file.readlines()[target_line_no - 1]
+        config_file.close
         #"set policy id **" 〜 "exit"までの値を取得する
         if 'exit' in target_line:
             break
         else:
             policy_element = target_line.strip().split()
-            #print(policy_value_list) 
             if 'set' in policy_element and 'policy' in policy_element and 'from' in policy_element :
                 #Policy定義1行目（ベースとなるポリシー）                 
                 base_policy = policy_element
                 policy_value_list.append(base_policy)
 
             elif 'set' in policy_element and 'src-address' in policy_element :
-                #base_policyリストの9個目の要素（src-address）にマルチセルポリシーの要素を追加する
-                policy_src_address = []
                 policy_src_address = copy.copy(base_policy)
-                policy_src_address[8] = policy_element[2]
+                #名前付きPolicy:base_policyリストの11個目の要素（src-address）にマルチセルポリシーの要素を追加する                
+                #名前無しPolicy：base_policyリストの9個目の要素（src-address）にマルチセルポリシーの要素を追加する
+                if base_policy[4] == "name" :
+                    policy_src_address[10] = policy_element[2]
+                else:    
+                    policy_src_address[8] = policy_element[2]
                 policy_value_list.append(policy_src_address)
 
             elif 'set' in policy_element and 'dst-address' in policy_element :
-                #base_policyリストの10個目の要素（dst-address）にマルチセルポリシーの要素を追加する
                 policy_dst_address = copy.copy(base_policy)
-                policy_dst_address[9] = policy_element[2]
+                #名前付きPolicy:base_policyリストの12個目の要素（dst-address）にマルチセルポリシーの要素を追加する                
+                #名前無しPolicy：base_policyリストの10個目の要素（dst-address）にマルチセルポリシーの要素を追加する                
+                if base_policy[4] == "name" :
+                    policy_dst_address[11] = policy_element[2]
+                else:    
+                    policy_dst_address[9] = policy_element[2]
                 policy_value_list.append(policy_dst_address)
 
             elif 'set' in policy_element and 'service' in policy_element :
-                #base_policyリストの11個目の要素（service）にマルチセルポリシーの要素を追加する
                 policy_service = copy.copy(base_policy)
-                policy_service[10] = policy_element[2]
+                #名前付きPolicy:base_policyリストの13個目の要素（service）にマルチセルポリシーの要素を追加する                
+                #名前無しPolicy：base_policyリストの11個目の要素（service）にマルチセルポリシーの要素を追加する                 
+                if base_policy[4] == "name" :
+                    policy_service[12] = policy_element[2]
+                else:    
+                    policy_service[10] = policy_element[2]
                 policy_value_list.append(policy_service)
 
         target_line_no += 1
         i += 1
-    
-    linecache.clearcache() 
+
     return policy_value_list
 
+
+def takeout_policy_value(key, value , dictionary) :
+    i = 0
+    #value配列に入ったPolicyの値を取り出して関数に渡す
+    for v in value :
+        convert_list_to_dict(key, value[i], dictionary)
+        i += 1      
     
 def append_noname_to_policy_dict(value):
 
@@ -185,6 +203,7 @@ def create_ifinfo():
 
 def absorb_config():
     line_count = 0
+    
     with open(file_name) as f:
         for line in f:
             line_count += 1
@@ -195,10 +214,12 @@ def absorb_config():
                 dictionary = policy_dict
                 if len(value) == 20 and "log" in value or len(value) == 19 and "log" not in value:
                     key = value_name_key
-                    convert_list_to_dict(key, value, dictionary)
+                    value = policy_multicell(file_name, line_count)
+                    takeout_policy_value(key, value, dictionary)
                 elif len(value) == 15 and "log" in value or len(value) == 14 and "log" not in value:
                     key = value_name_keyex
-                    convert_list_to_dict(key, value, dictionary)
+                    value = policy_multicell(file_name, line_count)
+                    takeout_policy_value(key, value, dictionary)
             elif "set policy id" in line and not "name" in line and "from" in line:
                 value = policy_multicell(file_name, line_count)
                 append_noname_to_policy_dict(value)
